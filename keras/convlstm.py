@@ -1,0 +1,161 @@
+# convlstm model
+import time
+import random
+import numpy as np
+from numpy import mean
+from numpy import std
+from numpy import array
+from numpy import argmax
+from pandas import read_csv
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import Dropout
+from keras.layers import LSTM
+from keras.layers import TimeDistributed
+from keras.layers import ConvLSTM2D
+from keras.metrics import Precision, Recall, AUC, MeanAbsoluteError
+from sklearn.metrics import f1_score, matthews_corrcoef
+from keras.utils import to_categorical
+
+# Seed
+seed = 100
+random.seed(seed)
+np.random.seed(seed)
+tf.random.set_seed(seed)
+
+def load_data(file):
+    loaded = list()
+    chunk_size = 16  
+    chunk_iterator = read_csv(file, chunksize=chunk_size)
+
+    for chunk in chunk_iterator:
+        chunk = chunk.iloc[:, :20]  
+        loaded.append(chunk)
+
+    return loaded
+
+# load data
+def data(n):
+   filepath = '../Data/time_series/k-fold/whole_block/' 
+   train_X = f'train_x_{n}.csv'
+   train_Y = f'train_y_{n}.csv'
+   train_file = filepath + train_X
+
+   trainX = load_data(train_file)
+   # trainX = transpose(trainX, (2, 0, 1))
+   trainX = array(trainX)
+   trainy = read_csv(filepath + train_Y, delim_whitespace=True)
+   print('train shape:',trainX.shape, trainy.shape)
+   trainy = to_categorical(trainy)
+
+   # load train data
+   test_X = f'test_x_{n}.csv'
+   test_Y = f'test_y_{n}.csv'
+   test_file = filepath + test_X
+
+   testX = load_data(test_file)
+   # testX = transpose(testX, (2, 0, 1))
+   testX = array(testX)
+   testy = read_csv(filepath + test_Y, delim_whitespace=True)
+   print('test shape:',testX.shape, testy.shape)
+   testy = to_categorical(testy)
+
+   print('Dataset loaded no.', n)
+   print(trainX.shape, trainy.shape, testX.shape, testy.shape)
+   print('exp_', n)
+
+   return trainX, trainy, testX, testy
+
+# fit and evaluate a model
+def evaluate_model(trainX, trainy, testX, testy, n):
+ # define model
+ verbose, epochs, batch_size = 0, 100, 64
+ n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
+
+ # reshape into subsequences (samples, time steps, rows, cols, channels)
+ n_steps, n_length = 2, 8
+ trainX = trainX.reshape((trainX.shape[0], n_steps, 1, n_length, n_features))
+ testX = testX.reshape((testX.shape[0], n_steps, 1, n_length, n_features))
+
+ # define model
+ model = Sequential()
+ model.add(ConvLSTM2D(filters=64, kernel_size=(1,3), activation='relu', input_shape=(n_steps, 1, n_length, n_features), return_sequences=True))
+ model.add(Dropout(0.5))
+
+ model.add(ConvLSTM2D(filters=32, kernel_size=(1,3), activation='relu', input_shape=(n_steps, 1, n_length, n_features), return_sequences=True))
+ model.add(Dropout(0.5))
+
+ model.add(ConvLSTM2D(filters=16, kernel_size=(1,3), activation='relu', input_shape=(n_steps, 1, n_length, n_features)))
+ model.add(Dropout(0.5))
+
+ model.add(Flatten())
+ model.add(Dense(100, activation='relu'))
+ model.add(Dense(n_outputs, activation='softmax'))
+
+ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])
+ 
+ # fit network
+ history = model.fit(trainX, trainy, epochs=epochs, batch_size=batch_size, verbose=verbose)
+   
+ # evaluate model
+ loss, accuracy, precision, recall, auc, mae = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
+ 
+ print(f"Train loss: {history.history['loss'][-1]:.8f}, Test loss: {loss:.8f}")
+
+ # Make predictions on test set
+ y_pred = model.predict(testX)
+ y_true = argmax(testy, axis=1)
+ y_pred = argmax(y_pred, axis=1)
+
+# Calculate F1-Score and MCC
+ f1 = f1_score(y_true, y_pred, average='weighted')
+ mcc = matthews_corrcoef(y_true, y_pred)
+
+ # Save the entire model to a file.
+ model.save(f'Model_convlstm_{n}w.keras')
+
+# Save only the model weights to a file.
+ model.save_weights(f'Model_convlstm_{n}.keras')
+
+#  return accuracy
+ return accuracy, precision, recall, auc, f1, mcc, mae  
+
+# summarize scores
+def summarize_results(scores):
+ metrics = ["accuracy", "precision", "recall", "auc", "f1", "mcc", "mae"]
+ scores = array(scores)
+ result = {}
+
+ for idx, metric in enumerate(metrics):
+    m = mean(scores[:, idx])
+    s = std(scores[:, idx])
+    result[metric] = (m, s)  
+ return result
+
+# repeat experiment
+for n in range(0,9):
+   trainX, trainy, testX, testy = data(n)
+   repeats = 10
+   scores = list()
+   accuracy = list()
+   start_time = time.time()
+
+   for r in range(repeats):
+      score = evaluate_model(trainX, trainy, testX, testy, n)   
+      # print('>#%d: %.3f' % (r+1, score))
+
+      print('>#', r+1 ,': acc %.4f%%' % (score[0]*100.0), 'prec %.4f' % (score[1]), 'recall %.4f' % (score[2]), \
+            'f1 %.4f' % (score[4]), 'mcc %.4f' % (score[6]) , 'mae %.4f' % (score[6] / 100.0))
+      accuracy.append(score[0])
+      scores.append(score)
+
+   end_time = time.time()
+   elapsed_time = end_time - start_time
+   print(f"The operation took {elapsed_time} seconds.")
+
+   # summarize results
+   results = summarize_results(scores)
+   for metric, (m, s) in results.items():
+      print(f"{metric}: Mean = {m:.4f}, Std = {s:.6f}")
