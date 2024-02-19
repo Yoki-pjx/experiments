@@ -132,8 +132,6 @@ def metrics(model, ds, thresh=0.5):
   f1 = 2.0 / ((1.0 / precision) + (1.0 / recall))
   mcc = (tp * tn - fp * fn) / math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
 
-  print(type(train_ds))
-  print(type(test_ds))
   return (accuracy, precision, recall, f1, mcc)  # as a Tuple
 
 # ---------------------------------------------------------
@@ -147,6 +145,7 @@ def data(n):
 
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+    
 
     print(f"\nDataset {n} loaded...")
 
@@ -158,6 +157,8 @@ best_epoch = []
 
 print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
 
+train_ds = []
+test_ds = []
 
 for n in range(0,9):
   best_acc = 0
@@ -179,7 +180,7 @@ for n in range(0,9):
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
 
-  train_loader, test_loader, train_ds, test_ds = data(n)
+  train_loader, test_loader, train_ds[n], test_ds[n] = data(n)
 
   print("\nStarting training")
   for epoch in range(0, max_epochs):
@@ -211,7 +212,7 @@ for n in range(0,9):
 
     print(f'\nEpoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
 
-    metrics_train = metrics(net, train_ds, thresh=0.5)
+    metrics_train = metrics(net, train_ds[n], thresh=0.5)
     print("Metrics for train data: "
         f"accuracy = {metrics_train[0]:0.4f}, "
         f"precision = {metrics_train[1]:0.4f}, "
@@ -219,7 +220,7 @@ for n in range(0,9):
         f"F1 = {metrics_train[3]:0.4f}, "
         f"mcc = {metrics_train[4]:0.4f}")
 
-    metrics_test = metrics(net, test_ds, thresh=0.5)
+    metrics_test = metrics(net, test_ds[n], thresh=0.5)
     print("Metrics for test data: "
         f"accuracy = {metrics_test[0]:0.4f}, "
         f"precision = {metrics_test[1]:0.4f}, "
