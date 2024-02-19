@@ -204,9 +204,8 @@ for n in range(0,9):
         loss = loss_func(output, target)
         loss.backward()
         optimizer.step()
-        total_train_loss += loss.item()  # 累加每个批次的损失
+        total_train_loss += loss.item()  
 
-    # 计算平均训练损失
     avg_train_loss = total_train_loss / len(train_loader.dataset)
 
     # ---------------------------------------------------------
@@ -220,7 +219,7 @@ for n in range(0,9):
             output = net(data)
             loss = loss_func(output, target)
             total_test_loss += loss.item()
-    # 计算平均训练损失
+    
     avg_test_loss = total_test_loss / len(test_loader.dataset)
 
     print(f'Epoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
@@ -233,8 +232,8 @@ for n in range(0,9):
         f"F1 = {metrics_train[3]:0.4f}, "
         f"mcc = {metrics_train[4]:0.4f}")
 
-  metrics_test = metrics(net, test_ds, thresh=0.5)
-  print("\nMetrics for test data: "
+    metrics_test = metrics(net, test_ds, thresh=0.5)
+    print("\nMetrics for test data: "
         f"accuracy = {metrics_test[0]:0.4f}, "
         f"precision = {metrics_test[1]:0.4f}, "
         f"recall = {metrics_test[2]:0.4f}, "
