@@ -74,7 +74,7 @@ def data_load(n):
 # fit and evaluate a model
 def evaluate_model(trainX, trainy, testX, testy, n):
  # define model
- verbose, epochs, batch_size = 2, 100, 64
+ verbose, epochs, batch_size = 2, 200, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
  # reshape data into time steps of sub-sequences
  n_steps, n_length = 2, 8
