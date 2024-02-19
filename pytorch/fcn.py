@@ -16,7 +16,7 @@ print(device)
 seed = 166  
 batch_size = 512
 lrn_rate = 0.005
-max_epochs = 1
+max_epochs = 500
 
 
 def setup_seed(seed):
