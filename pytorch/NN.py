@@ -175,7 +175,7 @@ for n in range(0,9):
         f"Learn rate: {lrn_rate:0.4f}, "
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
-    
+  del train_ds, test_ds  
   train_loader, test_loader, train_ds, test_ds = data(n)
 
   print("\nStarting training")
