@@ -131,6 +131,9 @@ def metrics(model, ds, thresh=0.5):
   recall = (1.0 * tp) / (tp + fn)
   f1 = 2.0 / ((1.0 / precision) + (1.0 / recall))
   mcc = (tp * tn - fp * fn) / math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+  print(type(train_ds))
+  print(type(test_ds))
   return (accuracy, precision, recall, f1, mcc)  # as a Tuple
 
 # ---------------------------------------------------------
@@ -144,9 +147,6 @@ def data(n):
 
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=0)
-    print(type(train_ds))
-    print(type(test_ds))
-
 
     print(f"\nDataset {n} loaded...")
 
