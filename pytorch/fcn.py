@@ -16,7 +16,7 @@ print(device)
 seed = 166  
 batch_size = 512
 lrn_rate = 0.005
-max_epochs = 2
+max_epochs = 1
 
 
 def setup_seed(seed):
@@ -157,11 +157,7 @@ best_epoch = []
 
 print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
 
-<<<<<<<< HEAD:pytorch/fcn.py
 for n in range(0,10):
-========
-for n in range(0,9):
->>>>>>>> f73474a6551ec70c78dc42ea826ed73df67c3f79:pytorch/FCN.py
   best_acc = 0
   best_acc_epoch = 0
   setup_seed(seed)
@@ -181,11 +177,7 @@ for n in range(0,9):
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
 
-<<<<<<<< HEAD:pytorch/fcn.py
   train_loader, test_loader, train_ds, test_ds = data_load(n)
-========
-  train_loader, test_loader, train_ds, test_ds = data(n)
->>>>>>>> f73474a6551ec70c78dc42ea826ed73df67c3f79:pytorch/FCN.py
 
   print("\nStarting training")
   for epoch in range(0, max_epochs):
@@ -248,20 +240,13 @@ for n in range(0,9):
 
   test_acc.append(best_acc)
   best_epoch.append(best_acc_epoch)
-<<<<<<<< HEAD:pytorch/fcn.py
+
   print(f"Dataset {n} - Accuracy: {test_acc[-1]}, Best Epoch: {best_epoch[-1]}")
 
   
 for n, (acc, epoch) in enumerate(zip(test_acc, best_epoch)):
     print(f"Dataset {n} - Accuracy: {acc:.6f}, Best Epoch: {epoch}")
-
-    
-print("\nAvg CV accuracy:", sum(test_acc) / len(test_acc))
-========
-  for acc, epoch in zip(test_acc, best_epoch):
-    print(f"Dataset {n} - Accuracy: {acc}, Best Epoch: {epoch}")
-
     
 print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
->>>>>>>> f73474a6551ec70c78dc42ea826ed73df67c3f79:pytorch/FCN.py
+
 print("Binary classification end... ")
