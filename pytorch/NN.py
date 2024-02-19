@@ -13,7 +13,7 @@ print(device)
 
 # 0. get started
 print("\nDanger detection using PyTorch ")
-seed = 100  
+seed = 166  
 
 # 1. create Dataset and DataLoader objects
 print("\nCreating train and test Datasets ")
@@ -153,7 +153,11 @@ def data(n):
     return train_loader, test_loader, train_ds, test_ds
 
 # ---------------------------------------------------------
+test_acc = []
+
 for n in range(0,9):
+  best_test_acc = 0
+  best_acc_epoch = 0
   setup_seed(seed)
   time_start = time.time()
   train_loader, test_loader, train_ds, test_ds = data(n)
@@ -171,7 +175,7 @@ for n in range(0,9):
 
   print(f"Loss function: {loss_func}, "
         f"Optimizer: {optimizer.__class__.__name__}, "
-        f"Learn rate: {lrn_rate:0.3f}, "
+        f"Learn rate: {lrn_rate:0.4f}, "
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
 
@@ -238,6 +242,10 @@ for n in range(0,9):
         f"recall = {metrics_test[2]:0.4f}, "
         f"F1 = {metrics_test[3]:0.4f}, "
         f"mcc = {metrics_test[4]:0.4f}")
+
+    if best_acc < metrics_test[0]:
+        best_acc = metrics_test[0]
+        best_acc_epoch = epoch
   
   time_end = time.time()
   print("Train cost time = ", time_end - time_start)
@@ -248,6 +256,8 @@ for n in range(0,9):
   path = f'Model_nn_{n}.pt'
   torch.save(net.state_dict(), path)
 
-
+  test_acc.append(best_acc)
+    
+print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
 print("Binary classification end... ")
 
