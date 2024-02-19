@@ -141,9 +141,11 @@ def data(n):
 
     train_ds = MyDataset(train_file)  
     test_ds = MyDataset(test_file)    
+    print("ds pass")
 
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+    print("loader pass")
 
     print(f"\nDataset {n} loaded...")
 
@@ -241,7 +243,6 @@ for n in range(0,9):
   best_epoch.append(best_acc_epoch)
   for acc, epoch in zip(test_acc, best_epoch):
     print(f"Dataset {n} - Accuracy: {acc}, Best Epoch: {epoch}")
-  del train_ds, test_ds 
 
     
 print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
