@@ -21,7 +21,7 @@ print(device)
 num_classes = 2
 time_window = 100  # simulating time-steps 
 batch_size = 100  # batch size 
-epochs = 100  # number of total epochs to run 
+epochs = 1  # number of total epochs to run 
 num_workers = 4  # number of data loading workers (default: 4) 
 
 amp = False  # automatic mixed precision training (set True if you want to use it) 
@@ -96,6 +96,9 @@ class SNN(nn.Module):
 
     def forward(self, x: torch.Tensor):
         return self.layer(x)
+    
+    def __repr__(self):
+        return "snn model"
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -126,13 +129,12 @@ The network with FC-LIF structure for classifying MNIST.\n
 This function initials the network, starts trainingand shows accuracy on test dataset.
 '''
 
-for n in range(0,9):
+for n in range(0,10):
     start_time = time.time()
     train_loader, test_loader = data_load(n)
 
     setup_seed(166)
     net = SNN(tau=tau)
-    print(net)
     net.to(device)
 
     scaler = None
@@ -230,7 +232,7 @@ for n in range(0,9):
         train_loss /= train_samples
         train_acc /= train_samples
 
-        print(f'epoch {epoch} train_loss = {train_loss: .6f}, train_acc = {train_acc: .6f}')
+        # print(f'epoch {epoch} train_loss = {train_loss: .6f}, train_acc = {train_acc: .6f}')
 
         # writer.add_scalar('train_loss', train_loss, epoch)
         # writer.add_scalar('train_acc', train_acc, epoch)
@@ -273,7 +275,7 @@ for n in range(0,9):
         test_loss /= test_samples
         test_acc /= test_samples
 
-        print(f'epoch {epoch} test_loss = {test_loss: .6f}, test_acc = {test_acc: .6f}')
+        # print(f'epoch {epoch} test_loss = {test_loss: .6f}, test_acc = {test_acc: .6f}')
 
         precision = precision_score(all_targets, all_predictions, average='macro')
         recall = recall_score(all_targets, all_predictions, average='macro')
@@ -311,35 +313,32 @@ for n in range(0,9):
         MAE_recd.append(mae)
 
 
-        print(f'epoch {epoch} train_loss ={train_loss: .4f}, train_acc ={train_acc: .4f}, test_loss ={test_loss: .4f}, test_acc ={test_acc: .4f}')
+        print(f'epoch {epoch} train_loss ={train_loss: .6f}, train_acc ={train_acc: .6f}, test_loss ={test_loss: .6f}, test_acc ={test_acc: .6f}')
         print(f'epoch {epoch} test_loss = {test_loss: .4f}, test_acc = {test_acc: .4f}, precision = {precision: .4f}, recall = {recall: .4f}, F1 = {f1: .4f}, MCC = {mcc: .4f}, MAE = {mae: .4f}')
         print(f'train speed ={train_speed: .4f} entires/s, test speed ={test_speed: .4f} entires/s\n')
         # print(f'escape time = {(datetime.datetime.now() + datetime.timedelta(seconds=(time.time() - start_time) * (epochs - epoch))).strftime("%Y-%m-%d %H:%M:%S")}\n')
     
-    print(f'max_test_acc ={max_test_acc: .4f} at epoch {max_acc_epoch}')
-    print('--------------------------------------------------')
+    print(f'max_test_acc ={max_test_acc: .6f} at epoch {max_acc_epoch}')
+    
 
 
 
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"The operation took {elapsed_time} seconds.")
+    print(f"The operation took {elapsed_time: .6f} seconds.")
 
     # save model
     print("\nSaving trained model state_dict ")
     net.eval()
-    path = f"F:/programming/SNN_HP/Model_basic_snn_{n}.pt"
+    path = f'Model_basic_snn_{n}.pt'
     torch.save(net.state_dict(), path)
 
     model = SNN(tau=tau)
-    path_whole1 = f"F:/programming/SNN_HP/Model_basic_snn_{n}w.pt"
-    path_whole2 = f"F:/programming/SNN_HP/Model_basic_snn_{n}w.pth"
-    torch.save(model, path_whole1)
-    torch.save(model, path_whole2)
-    
+    path_whole1 = f'Model_basic_snn_{n}w.pt'
+    torch.save(model, path_whole1)  
 
     print(f'Avg. test_acc = {np.mean(acc_recd): .4f}, precision = {np.mean(prec_recd): .4f}, recall = {np.mean(recall_recd): .4f}, F1 = {np.mean(F1_recd): .4f}, MCC = {np.mean(MCC_recd): .4f}, MAE = {np.mean(MAE_recd): .4f}')
-
+    print('--------------------------------------------------')
 
     # # plot
     # net.eval()

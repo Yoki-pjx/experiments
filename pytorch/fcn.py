@@ -74,10 +74,10 @@ class MyDataset(Dataset):
 class Net(torch.nn.Module):
     def __init__(self):
         super(Net,self).__init__()
-        self.hid1 = torch.nn.Linear(20,10) # 21-(10-10)-1
-        self.hid2 = torch.nn.Linear(10,10)
-        self.hid3 = torch.nn.Linear(10,10)
-        self.oupt = torch.nn.Linear(10,1)
+        self.hid1 = torch.nn.Linear(20,64) 
+        self.hid2 = torch.nn.Linear(64,32)
+        self.hid3 = torch.nn.Linear(32,16)
+        self.oupt = torch.nn.Linear(16,1)
 
         torch.nn.init.xavier_uniform_(self.hid1.weight) 
         torch.nn.init.zeros_(self.hid1.bias)
@@ -155,7 +155,7 @@ def data_load(n):
 test_acc = []
 best_epoch = []
 
-print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
+print("\nCreating 20-(64-32-16)-1 binary FCN classifier \n")
 
 for n in range(0,10):
   best_acc = 0
@@ -230,13 +230,18 @@ for n in range(0,10):
         best_acc_epoch = epoch
   
   time_end = time.time()
-  print("Train cost time = ", time_end - time_start)
+  elapsed_time = time_end - time_start
+  print(f"Train cost time = {elapsed_time: .6f}", )
 
   # 5. save model
   print("\nSaving trained model state_dict ")
   net.eval()
-  path = f'Model_fcn_{n}.pt'
+  path = f'Model_fcn3_{n}.pt'
   torch.save(net.state_dict(), path)
+
+  model = Net()
+  path_whole = f'Model_fcn3_{n}w.pt'
+  torch.save(model, path_whole) 
 
   test_acc.append(best_acc)
   best_epoch.append(best_acc_epoch)
