@@ -12,11 +12,8 @@ print(device)
 
 
 # 0. get started
-print("\nDanger detection using PyTorch ")
-seed = 166  
 
-# 1. create Dataset and DataLoader objects
-print("\nCreating train and test Datasets ")
+seed = 166  
 batch_size = 512
 lrn_rate = 0.005
 max_epochs = 2
@@ -156,6 +153,8 @@ def data(n):
 test_acc = []
 best_epoch = []
 
+print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
+
 for n in range(0,9):
   best_acc = 0
   best_acc_epoch = 0
@@ -163,7 +162,6 @@ for n in range(0,9):
   time_start = time.time()
   
   # 2. create neural network
-  print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
   net = Net().to(device)
   net.train()  # set training mode
 
@@ -182,23 +180,6 @@ for n in range(0,9):
 
   print("\nStarting training")
   for epoch in range(0, max_epochs):
-    # epoch_loss = 0.0            # for one full epoch
-#     for (batch_idx, batch) in enumerate(train_loader):
-#       X = batch[0]             
-#       Y = batch[1]             
-#       oupt = net(X)            
-
-#       loss_val = loss_func(oupt, Y)   # a tensor
-#       epoch_loss += loss_val.item()  # accumulate
-#       optimizer.zero_grad() # reset all gradients
-#       loss_val.backward()   # compute new gradients
-#       optimizer.step()      # update all weights
-
-#     if epoch % ep_log_interval == 0:
-#       print("epoch = %4d   loss = %8.4f" % \
-#         (epoch, epoch_loss))
-#   print("Train completed... ")
-
     total_train_loss = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
