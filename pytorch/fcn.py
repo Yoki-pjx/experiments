@@ -157,7 +157,7 @@ best_epoch = []
 
 print("\nCreating 20-(64-32-16)-1 binary FCN classifier \n")
 
-for n in range(0,1):
+for n in range(0,10):
   best_acc = 0
   best_acc_epoch = 0
   setup_seed(seed)

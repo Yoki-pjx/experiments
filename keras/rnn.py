@@ -69,7 +69,7 @@ def data_load(n):
 
 # fit and evaluate a model
 def evaluate_model(trainX, trainy, testX, testy, n):
- verbose, epochs, batch_size = 0, 100, 64
+ verbose, epochs, batch_size = 0, 200, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
  model = Sequential()
  model.add(SimpleRNN(64, input_shape=(n_timesteps,n_features), return_sequences=True))
