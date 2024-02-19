@@ -17,8 +17,8 @@ seed = 100
 
 # 1. create Dataset and DataLoader objects
 print("\nCreating train and test Datasets ")
-batch_size = 64
-lrn_rate = 0.01
+batch_size = 512
+lrn_rate = 0.005
 max_epochs = 500
 ep_log_interval = 20
 
