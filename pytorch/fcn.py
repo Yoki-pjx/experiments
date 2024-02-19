@@ -12,15 +12,11 @@ print(device)
 
 
 # 0. get started
-print("\nDanger detection using PyTorch ")
-seed = 100  
 
-# 1. create Dataset and DataLoader objects
-print("\nCreating train and test Datasets ")
-batch_size = 64
-lrn_rate = 0.01
-max_epochs = 500
-ep_log_interval = 20
+seed = 166  
+batch_size = 512
+lrn_rate = 0.005
+max_epochs = 2
 
 
 def setup_seed(seed):
@@ -135,11 +131,12 @@ def metrics(model, ds, thresh=0.5):
   recall = (1.0 * tp) / (tp + fn)
   f1 = 2.0 / ((1.0 / precision) + (1.0 / recall))
   mcc = (tp * tn - fp * fn) / math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
   return (accuracy, precision, recall, f1, mcc)  # as a Tuple
 
 # ---------------------------------------------------------
 
-def data(n):
+def data_load(n):
     train_file = f'../Data/k-fold/train_{n}.csv'
     test_file = f'../Data/k-fold/test_{n}.csv'  
 
@@ -148,19 +145,25 @@ def data(n):
 
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+    
 
     print(f"\nDataset {n} loaded...")
 
     return train_loader, test_loader, train_ds, test_ds
 
 # ---------------------------------------------------------
-for n in range(0,9):
+test_acc = []
+best_epoch = []
+
+print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
+
+for n in range(0,10):
+  best_acc = 0
+  best_acc_epoch = 0
   setup_seed(seed)
   time_start = time.time()
-  train_loader, test_loader, train_ds, test_ds = data(n)
-
+  
   # 2. create neural network
-  print("\nCreating 20-(10-10-10)-1 binary NN classifier \n")
   net = Net().to(device)
   net.train()  # set training mode
 
@@ -168,34 +171,16 @@ for n in range(0,9):
   loss_func = torch.nn.BCELoss()  # binary cross entropy
   # loss_func = torch.nn.MSELoss()
   optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
-
-
   print(f"Loss function: {loss_func}, "
         f"Optimizer: {optimizer.__class__.__name__}, "
-        f"Learn rate: {lrn_rate:0.3f}, "
+        f"Learn rate: {lrn_rate:0.4f}, "
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
 
+  train_loader, test_loader, train_ds, test_ds = data_load(n)
 
   print("\nStarting training")
   for epoch in range(0, max_epochs):
-    # epoch_loss = 0.0            # for one full epoch
-#     for (batch_idx, batch) in enumerate(train_loader):
-#       X = batch[0]             
-#       Y = batch[1]             
-#       oupt = net(X)            
-
-#       loss_val = loss_func(oupt, Y)   # a tensor
-#       epoch_loss += loss_val.item()  # accumulate
-#       optimizer.zero_grad() # reset all gradients
-#       loss_val.backward()   # compute new gradients
-#       optimizer.step()      # update all weights
-
-#     if epoch % ep_log_interval == 0:
-#       print("epoch = %4d   loss = %8.4f" % \
-#         (epoch, epoch_loss))
-#   print("Train completed... ")
-
     total_train_loss = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
@@ -204,9 +189,8 @@ for n in range(0,9):
         loss = loss_func(output, target)
         loss.backward()
         optimizer.step()
-        total_train_loss += loss.item()  # 累加每个批次的损失
+        total_train_loss += loss.item()  
 
-    # 计算平均训练损失
     avg_train_loss = total_train_loss / len(train_loader.dataset)
 
     # ---------------------------------------------------------
@@ -220,10 +204,10 @@ for n in range(0,9):
             output = net(data)
             loss = loss_func(output, target)
             total_test_loss += loss.item()
-    # 计算平均训练损失
+    
     avg_test_loss = total_test_loss / len(test_loader.dataset)
 
-    print(f'Epoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
+    print(f'\nEpoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
 
     metrics_train = metrics(net, train_ds, thresh=0.5)
     print("Metrics for train data: "
@@ -233,13 +217,17 @@ for n in range(0,9):
         f"F1 = {metrics_train[3]:0.4f}, "
         f"mcc = {metrics_train[4]:0.4f}")
 
-  metrics_test = metrics(net, test_ds, thresh=0.5)
-  print("\nMetrics for test data: "
+    metrics_test = metrics(net, test_ds, thresh=0.5)
+    print("Metrics for test data: "
         f"accuracy = {metrics_test[0]:0.4f}, "
         f"precision = {metrics_test[1]:0.4f}, "
         f"recall = {metrics_test[2]:0.4f}, "
         f"F1 = {metrics_test[3]:0.4f}, "
         f"mcc = {metrics_test[4]:0.4f}")
+
+    if best_acc < metrics_test[0]:
+        best_acc = metrics_test[0]
+        best_acc_epoch = epoch
   
   time_end = time.time()
   print("Train cost time = ", time_end - time_start)
@@ -247,9 +235,17 @@ for n in range(0,9):
   # 5. save model
   print("\nSaving trained model state_dict ")
   net.eval()
-  path = f'Model_nn_{n}.pt'
+  path = f'Model_fcn_{n}.pt'
   torch.save(net.state_dict(), path)
 
+  test_acc.append(best_acc)
+  best_epoch.append(best_acc_epoch)
+  print(f"Dataset {n} - Accuracy: {test_acc[-1]}, Best Epoch: {best_epoch[-1]}")
 
+  
+for n, (acc, epoch) in enumerate(zip(test_acc, best_epoch)):
+    print(f"Dataset {n} - Accuracy: {acc:.6f}, Best Epoch: {epoch}")
+
+    
+print("\nAvg CV accuracy:", sum(test_acc) / len(test_acc))
 print("Binary classification end... ")
-

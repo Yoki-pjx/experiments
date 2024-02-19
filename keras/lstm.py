@@ -17,7 +17,7 @@ from sklearn.metrics import f1_score, matthews_corrcoef
 from keras.utils import to_categorical
 
 # Seed
-seed = 100
+seed = 166
 random.seed(seed)
 np.random.seed(seed)
 tf.random.set_seed(seed)
@@ -45,7 +45,7 @@ def load_data(file):
 #     return loaded
 
 # load data
-def data(n):
+def data_load(n):
     filepath = "../Data/time_series/k-fold/whole_block/"
     train_X = f'train_x_{n}.csv'
     train_Y = f'train_y_{n}.csv'
@@ -142,7 +142,7 @@ def summarize_results(scores):
 
 # repeat experiment
 for n in range(0,9):
-    trainX, trainy, testX, testy = data(n)
+    trainX, trainy, testX, testy = data_load(n)
     repeats = 10
     scores = list()
     accuracy = list()

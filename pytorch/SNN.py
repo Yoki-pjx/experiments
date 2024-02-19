@@ -99,7 +99,7 @@ class SNN(nn.Module):
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-def data(n):
+def data_load(n):
     train_file = f'../Data/k-fold/train_{n}.csv'
     test_file = f'../Data/k-fold/test_{n}.csv'   
 
@@ -128,9 +128,9 @@ This function initials the network, starts trainingand shows accuracy on test da
 
 for n in range(0,9):
     start_time = time.time()
-    train_loader, test_loader = data(n)
+    train_loader, test_loader = data_load(n)
 
-    setup_seed(1)
+    setup_seed(166)
     net = SNN(tau=tau)
     print(net)
     net.to(device)
