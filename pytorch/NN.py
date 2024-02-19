@@ -175,7 +175,7 @@ for n in range(0,9):
         f"Learn rate: {lrn_rate:0.4f}, "
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
-  del train_ds, test_ds  
+   
   train_loader, test_loader, train_ds, test_ds = data(n)
 
   print("\nStarting training")
@@ -241,6 +241,7 @@ for n in range(0,9):
   best_epoch.append(best_acc_epoch)
   for acc, epoch in zip(test_acc, best_epoch):
     print(f"Dataset {n} - Accuracy: {acc}, Best Epoch: {epoch}")
+  del train_ds, test_ds 
 
     
 print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
