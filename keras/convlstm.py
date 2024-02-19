@@ -91,7 +91,7 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  model.add(Dropout(0.5))
 
  model.add(Flatten())
- model.add(Dense(100, activation='relu'))
+ model.add(Dense(10, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
 
  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])

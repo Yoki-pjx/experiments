@@ -14,9 +14,9 @@ print(device)
 # 0. get started
 
 seed = 166  
-batch_size = 512
+batch_size = 256
 lrn_rate = 0.005
-max_epochs = 500
+max_epochs = 200
 
 
 def setup_seed(seed):
@@ -157,7 +157,7 @@ best_epoch = []
 
 print("\nCreating 20-(64-32-16)-1 binary FCN classifier \n")
 
-for n in range(0,10):
+for n in range(0,1):
   best_acc = 0
   best_acc_epoch = 0
   setup_seed(seed)
@@ -252,6 +252,6 @@ print("\n")
 for n, (acc, epoch) in enumerate(zip(test_acc, best_epoch)):
     print(f"Dataset {n} - Accuracy: {acc:.6f}, Best Epoch: {epoch}")
     
-print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
+print("Avg 10-fold CV accuracy:", sum(test_acc) / len(test_acc))
 
 print("Binary classification end... ")

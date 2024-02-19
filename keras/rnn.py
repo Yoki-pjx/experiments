@@ -81,7 +81,7 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  model.add(SimpleRNN(16))
  model.add(Dropout(0.5))
 
- model.add(Dense(8, activation='relu'))
+ model.add(Dense(16, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
 
  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])

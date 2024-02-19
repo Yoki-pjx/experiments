@@ -20,8 +20,8 @@ print(device)
 # Hyper-parameters
 num_classes = 2
 time_window = 100  # simulating time-steps 
-batch_size = 512  # batch size 
-epochs = 100  # number of total epochs to run 
+batch_size = 256  # batch size 
+epochs = 200  # number of total epochs to run 
 num_workers = 4  # number of data loading workers (default: 4) 
 
 amp = False  # automatic mixed precision training (set True if you want to use it) 
