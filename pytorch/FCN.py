@@ -243,7 +243,7 @@ for n in range(0,10):
 
   print(f"Dataset {n} - Accuracy: {test_acc[-1]}, Best Epoch: {best_epoch[-1]}")
 
-  
+print("\n")  
 for n, (acc, epoch) in enumerate(zip(test_acc, best_epoch)):
     print(f"Dataset {n} - Accuracy: {acc:.6f}, Best Epoch: {epoch}")
     
