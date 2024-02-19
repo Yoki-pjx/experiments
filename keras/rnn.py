@@ -72,16 +72,16 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  verbose, epochs, batch_size = 0, 100, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
  model = Sequential()
- model.add(SimpleRNN(32, input_shape=(n_timesteps,n_features), return_sequences=True))
+ model.add(SimpleRNN(64, input_shape=(n_timesteps,n_features), return_sequences=True))
  model.add(Dropout(0.5))
 
-#  model.add(SimpleRNN(64, return_sequences=True))
-#  model.add(Dropout(0.5))
-
- model.add(SimpleRNN(64))
+ model.add(SimpleRNN(32, return_sequences=True))
  model.add(Dropout(0.5))
 
- model.add(Dense(128, activation='relu'))
+ model.add(SimpleRNN(16))
+ model.add(Dropout(0.5))
+
+ model.add(Dense(8, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
 
  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])

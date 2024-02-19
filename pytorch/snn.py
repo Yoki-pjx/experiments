@@ -20,8 +20,8 @@ print(device)
 # Hyper-parameters
 num_classes = 2
 time_window = 100  # simulating time-steps 
-batch_size = 100  # batch size 
-epochs = 1  # number of total epochs to run 
+batch_size = 512  # batch size 
+epochs = 100  # number of total epochs to run 
 num_workers = 4  # number of data loading workers (default: 4) 
 
 amp = False  # automatic mixed precision training (set True if you want to use it) 
@@ -29,6 +29,8 @@ optimizer_choice = 'adam'  # use which optimizer. 'sgd' or 'adam'
 momentum = 0.9  # momentum for SGD 
 learning_rate = 1e-3  # learning rate 
 tau = 2.0  # parameter tau of LIF neuron 
+
+seed = 166
 
 # data_dir = 'path/to/your/mnist/dataset'  # root dir of MNIST dataset 
 # out_dir = './logs'  # root dir for saving logs and checkpoint 
@@ -90,15 +92,20 @@ class SNN(nn.Module):
 
         self.layer = nn.Sequential(
             layer.Flatten(),
-            layer.Linear(1 * 20, 2, bias=False),
+            layer.Linear(1 * 20, 64, bias=False),
+            neuron.LIFNode(tau=tau, surrogate_function=surrogate.ATan()),
+            layer.Linear(64, 32, bias=False),
+            neuron.LIFNode(tau=tau, surrogate_function=surrogate.ATan()),
+            layer.Linear(32, 16, bias=False),
+            neuron.LIFNode(tau=tau, surrogate_function=surrogate.ATan()),
+            layer.Linear(16, 2, bias=False),
             neuron.LIFNode(tau=tau, surrogate_function=surrogate.ATan()),
             )
 
     def forward(self, x: torch.Tensor):
         return self.layer(x)
     
-    def __repr__(self):
-        return "snn model"
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +140,7 @@ for n in range(0,10):
     start_time = time.time()
     train_loader, test_loader = data_load(n)
 
-    setup_seed(166)
+    setup_seed(seed)
     net = SNN(tau=tau)
     net.to(device)
 
@@ -330,11 +337,11 @@ for n in range(0,10):
     # save model
     print("\nSaving trained model state_dict ")
     net.eval()
-    path = f'Model_basic_snn_{n}.pt'
+    path = f'Model_basic_snn3_{n}.pt'
     torch.save(net.state_dict(), path)
 
     model = SNN(tau=tau)
-    path_whole1 = f'Model_basic_snn_{n}w.pt'
+    path_whole1 = f'Model_basic_snn3_{n}w.pt'
     torch.save(model, path_whole1)  
 
     print(f'Avg. test_acc = {np.mean(acc_recd): .4f}, precision = {np.mean(prec_recd): .4f}, recall = {np.mean(recall_recd): .4f}, F1 = {np.mean(F1_recd): .4f}, MCC = {np.mean(MCC_recd): .4f}, MAE = {np.mean(MAE_recd): .4f}')
