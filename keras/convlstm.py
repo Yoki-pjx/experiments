@@ -71,7 +71,7 @@ def data_load(n):
 # fit and evaluate a model
 def evaluate_model(trainX, trainy, testX, testy, n):
  # define model
- verbose, epochs, batch_size = 0, 100, 64
+ verbose, epochs, batch_size = 0, 200, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
 
  # reshape into subsequences (samples, time steps, rows, cols, channels)
@@ -91,7 +91,7 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  model.add(Dropout(0.5))
 
  model.add(Flatten())
- model.add(Dense(10, activation='relu'))
+ model.add(Dense(16, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
 
  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])
@@ -114,10 +114,10 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  mcc = matthews_corrcoef(y_true, y_pred)
 
  # Save the entire model to a file.
- model.save(f'Model_convlstm_{n}w.keras')
+ model.save(f'Model_convlstm3_{n}w.keras')
 
 # Save only the model weights to a file.
- model.save_weights(f'Model_convlstm_{n}.keras')
+ model.save_weights(f'Model_convlstm3_{n}.keras')
 
 #  return accuracy
  return accuracy, precision, recall, auc, f1, mcc, mae  
@@ -135,7 +135,7 @@ def summarize_results(scores):
  return result
 
 # repeat experiment
-for n in range(0,9):
+for n in range(0,10):
    trainX, trainy, testX, testy = data_load(n)
    repeats = 10
    scores = list()

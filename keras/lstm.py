@@ -79,13 +79,13 @@ def data_load(n):
 
 # fit and evaluate a model
 def evaluate_model(trainX, trainy, testX, testy, n):
- verbose, epochs, batch_size = 0, 100, 64
+ verbose, epochs, batch_size = 0, 200, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
  model = Sequential()
- model.add(LSTM(32, input_shape=(n_timesteps,n_features), return_sequences=True))
+ model.add(LSTM(64, input_shape=(n_timesteps,n_features), return_sequences=True))
  model.add(Dropout(0.5))
 
- model.add(LSTM(64, return_sequences=True))
+ model.add(LSTM(32, return_sequences=True))
  model.add(Dropout(0.5))
 
 #  model.add(LSTM(128, return_sequences=True))
@@ -94,10 +94,10 @@ def evaluate_model(trainX, trainy, testX, testy, n):
 #  model.add(LSTM(256, return_sequences=True))
 #  model.add(Dropout(0.5))
 
- model.add(LSTM(128))
+ model.add(LSTM(16))
  model.add(Dropout(0.5))
 
- model.add(Dense(256, activation='relu'))
+ model.add(Dense(16, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
 
  model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Precision(), Recall(), AUC(), MeanAbsoluteError()])
@@ -120,10 +120,10 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  mcc = matthews_corrcoef(y_true, y_pred)
 
 # Save the entire model to a file.
- model.save(f'Model_lstm_{n}w.keras')
+ model.save(f'Model_lstm3_{n}w.keras')
 
 # Save only the model weights to a file.
- model.save_weights(f'Model_lstm_{n}.keras')
+ model.save_weights(f'Model_lstm3_{n}.keras')
 
 #  return accuracy
  return accuracy, precision, recall, auc, f1, mcc, mae  
@@ -141,7 +141,7 @@ def summarize_results(scores):
  return result
 
 # repeat experiment
-for n in range(0,9):
+for n in range(0,10):
     trainX, trainy, testX, testy = data_load(n)
     repeats = 10
     scores = list()

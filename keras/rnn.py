@@ -104,10 +104,10 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  mcc = matthews_corrcoef(y_true, y_pred)
 
 # Save the entire model to a file.
- model.save(f'Model_rnn_{n}w.keras')
+ model.save(f'Model_rnn3_{n}w.keras')
 
 # Save only the model weights to a file.
- model.save_weights(f'Model_rnn_{n}.keras')
+ model.save_weights(f'Model_rnn3_{n}.keras')
 
 #  return accuracy
  return accuracy, precision, recall, auc, f1, mcc, mae  
@@ -124,7 +124,7 @@ def summarize_results(scores):
  return result
 
 # repeat experiment
-for n in range(0,9):
+for n in range(0,10):
     trainX, trainy, testX, testy = data_load(n)
     repeats = 10
     scores = list()

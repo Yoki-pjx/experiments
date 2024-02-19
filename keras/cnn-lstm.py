@@ -89,10 +89,10 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  model.add(TimeDistributed(MaxPooling1D(pool_size=2)))
  model.add(TimeDistributed(Flatten()))
 
- model.add(LSTM(20))
+ model.add(LSTM(32))
  model.add(Dropout(0.5))
 
- model.add(Dense(100, activation='relu'))
+ model.add(Dense(16, activation='relu'))
  model.add(Dense(n_outputs, activation='softmax'))
  
  # fit network
@@ -135,7 +135,7 @@ def summarize_results(scores):
  return result
 
 # repeat experiment
-for n in range(0,9):
+for n in range(0,10):
     trainX, trainy, testX, testy = data_load(n)
     repeats = 10
     scores = list()
