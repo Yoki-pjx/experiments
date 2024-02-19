@@ -235,7 +235,7 @@ for n in range(0,9):
   # 5. save model
   print("\nSaving trained model state_dict ")
   net.eval()
-  path = f'Model_nn_{n}.pt'
+  path = f'Model_fcn_{n}.pt'
   torch.save(net.state_dict(), path)
 
   test_acc.append(best_acc)
