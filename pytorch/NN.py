@@ -19,7 +19,7 @@ seed = 166
 print("\nCreating train and test Datasets ")
 batch_size = 512
 lrn_rate = 0.005
-max_epochs = 500
+max_epochs = 2
 
 
 def setup_seed(seed):
@@ -154,16 +154,16 @@ def data(n):
 
 # ---------------------------------------------------------
 test_acc = []
+best_epoch = []
 
 for n in range(0,9):
-  best_test_acc = 0
+  best_acc = 0
   best_acc_epoch = 0
   setup_seed(seed)
   time_start = time.time()
-  train_loader, test_loader, train_ds, test_ds = data(n)
-
+  
   # 2. create neural network
-  print("\nCreating 20-(10-10-10)-1 binary NN classifier \n")
+  print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
   net = Net().to(device)
   net.train()  # set training mode
 
@@ -172,13 +172,13 @@ for n in range(0,9):
   # loss_func = torch.nn.MSELoss()
   optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
 
-
   print(f"Loss function: {loss_func}, "
         f"Optimizer: {optimizer.__class__.__name__}, "
         f"Learn rate: {lrn_rate:0.4f}, "
         f"Batch size: {batch_size}, "
         f"Max epochs: {max_epochs}")
-
+    
+  train_loader, test_loader, train_ds, test_ds = data(n)
 
   print("\nStarting training")
   for epoch in range(0, max_epochs):
@@ -257,6 +257,10 @@ for n in range(0,9):
   torch.save(net.state_dict(), path)
 
   test_acc.append(best_acc)
+  best_epoch.append(best_acc_epoch)
+  for acc, epoch in zip(test_acc, best_epoch):
+    print(f"Dataset {n} - Accuracy: {acc}, Best Epoch: {epoch}")
+
     
 print("Avg CV accuracy:", sum(test_acc) / len(test_acc))
 print("Binary classification end... ")
