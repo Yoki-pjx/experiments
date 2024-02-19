@@ -49,7 +49,7 @@ def data_load(n):
     # trainX = transpose(trainX, (2, 0, 1))
     trainX = array(trainX)
     trainy = read_csv(filepath + train_Y, delim_whitespace=True)
-    print('train shape:',trainX.shape, trainy.shape)
+    # print('train shape:',trainX.shape, trainy.shape)
     trainy = to_categorical(trainy)
 
     # load test data
@@ -61,12 +61,12 @@ def data_load(n):
     # testX = transpose(testX, (2, 0, 1))
     testX = array(testX)
     testy = read_csv(filepath + test_Y, delim_whitespace=True)
-    print('test shape:',testX.shape, testy.shape)
+    # print('test shape:',testX.shape, testy.shape)
     testy = to_categorical(testy)
 
-    print('Dataset loaded no.', n)
+    print('\nDataset loaded no.', n)
     print('shapes:', trainX.shape, trainy.shape, testX.shape, testy.shape)
-    print('exp_', n)
+    # print('exp_', n)
 
     return trainX, trainy, testX, testy
 
@@ -74,7 +74,7 @@ def data_load(n):
 # fit and evaluate a model
 def evaluate_model(trainX, trainy, testX, testy, n):
  # define model
- verbose, epochs, batch_size = 0, 100, 64
+ verbose, epochs, batch_size = 2, 100, 64
  n_timesteps, n_features, n_outputs = trainX.shape[1], trainX.shape[2], trainy.shape[1]
  # reshape data into time steps of sub-sequences
  n_steps, n_length = 2, 8
@@ -102,7 +102,12 @@ def evaluate_model(trainX, trainy, testX, testy, n):
  # evaluate model
  loss, accuracy, precision, recall, auc, mae = model.evaluate(testX, testy, batch_size=batch_size, verbose=0)
  
- print(f"Train loss: {history.history['loss'][-1]:.8f}, Test loss: {loss:.8f}")
+#  print(f"Train loss: {history.history['loss'][-1]:.8f}, Test loss: {loss:.8f}")
+ print('Train info:')
+ losses = history.history['loss']
+ accuracies = history.history['accuracy']
+ for epoch in range(epochs):
+    print(f'Epoch {epoch+1}/{epochs} - Loss: {losses[epoch]:.4f}, Accuracy: {accuracies[epoch]:.4f}')
 
  # Make predictions on test set
  y_pred = model.predict(testX)
