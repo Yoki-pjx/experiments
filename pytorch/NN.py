@@ -20,7 +20,6 @@ print("\nCreating train and test Datasets ")
 batch_size = 512
 lrn_rate = 0.005
 max_epochs = 500
-ep_log_interval = 20
 
 
 def setup_seed(seed):
@@ -222,7 +221,7 @@ for n in range(0,9):
     
     avg_test_loss = total_test_loss / len(test_loader.dataset)
 
-    print(f'Epoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
+    print(f'\nEpoch: {epoch} - Average Training Loss: {avg_train_loss:.6f}, Average Test Loss: {avg_test_loss:.6f}')
 
     metrics_train = metrics(net, train_ds, thresh=0.5)
     print("Metrics for train data: "
