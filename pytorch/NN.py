@@ -141,11 +141,12 @@ def data(n):
 
     train_ds = MyDataset(train_file)  
     test_ds = MyDataset(test_file)    
-    print("ds pass")
 
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(test_ds, batch_size=batch_size, shuffle=True, num_workers=0)
-    print("loader pass")
+    print(type(train_ds))
+    print(type(test_ds))
+
 
     print(f"\nDataset {n} loaded...")
 
@@ -156,6 +157,11 @@ test_acc = []
 best_epoch = []
 
 print("\nCreating 20-(10-10-10)-1 binary FCN classifier \n")
+print(f"Loss function: {loss_func}, "
+        f"Optimizer: {optimizer.__class__.__name__}, "
+        f"Learn rate: {lrn_rate:0.4f}, "
+        f"Batch size: {batch_size}, "
+        f"Max epochs: {max_epochs}")
 
 for n in range(0,9):
   best_acc = 0
@@ -172,12 +178,6 @@ for n in range(0,9):
   # loss_func = torch.nn.MSELoss()
   optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
 
-  print(f"Loss function: {loss_func}, "
-        f"Optimizer: {optimizer.__class__.__name__}, "
-        f"Learn rate: {lrn_rate:0.4f}, "
-        f"Batch size: {batch_size}, "
-        f"Max epochs: {max_epochs}")
-   
   train_loader, test_loader, train_ds, test_ds = data(n)
 
   print("\nStarting training")
