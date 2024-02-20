@@ -300,6 +300,16 @@ for n in range(0,10):
             max_acc_epoch = epoch
             save_max = True
 
+            # save model
+            print("\nSaving trained model state_dict ")
+            net.eval()
+            path = f'Model_basic_snn3_{n}.pt'
+            torch.save(net.state_dict(), path)
+
+            model = SNN(tau=tau)
+            path_whole1 = f'Model_basic_snn3_{n}w.pt'
+            torch.save(model, path_whole1)  
+
         # checkpoint = {
         #     'net': net.state_dict(),
         #     'optimizer': optimizer.state_dict(),
@@ -324,25 +334,12 @@ for n in range(0,10):
         print(f'epoch {epoch} test_loss = {test_loss: .4f}, test_acc = {test_acc: .4f}, precision = {precision: .4f}, recall = {recall: .4f}, F1 = {f1: .4f}, MCC = {mcc: .4f}, MAE = {mae: .4f}')
         print(f'train speed ={train_speed: .4f} entires/s, test speed ={test_speed: .4f} entires/s\n')
         # print(f'escape time = {(datetime.datetime.now() + datetime.timedelta(seconds=(time.time() - start_time) * (epochs - epoch))).strftime("%Y-%m-%d %H:%M:%S")}\n')
-    
-    print(f'max_test_acc ={max_test_acc: .6f} at epoch {max_acc_epoch}')
-    
-
-
-
+ 
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"The operation took {elapsed_time: .6f} seconds.")
 
-    # save model
-    print("\nSaving trained model state_dict ")
-    net.eval()
-    path = f'Model_basic_snn3_{n}.pt'
-    torch.save(net.state_dict(), path)
-
-    model = SNN(tau=tau)
-    path_whole1 = f'Model_basic_snn3_{n}w.pt'
-    torch.save(model, path_whole1)  
+    print(f'\nmax_test_acc ={max_test_acc: .6f} at epoch {max_acc_epoch}')
 
     print(f'Avg. test_acc = {np.mean(acc_recd): .4f}, precision = {np.mean(prec_recd): .4f}, recall = {np.mean(recall_recd): .4f}, F1 = {np.mean(F1_recd): .4f}, MCC = {np.mean(MCC_recd): .4f}, MAE = {np.mean(MAE_recd): .4f}')
     print('--------------------------------------------------')
