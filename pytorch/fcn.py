@@ -163,11 +163,11 @@ for n in range(0,10):
   setup_seed(seed)
   time_start = time.time()
   
-  # 2. create neural network
+  # create neural network
   net = Net().to(device)
   net.train()  # set training mode
 
-  # 3. train network
+  # train network
   loss_func = torch.nn.BCELoss()  # binary cross entropy
   # loss_func = torch.nn.MSELoss()
   optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
@@ -195,7 +195,7 @@ for n in range(0,10):
 
     # ---------------------------------------------------------
 
-    # 4. evaluate model
+    # evaluate model
     net.eval()
     total_test_loss = 0
     with torch.no_grad():
@@ -228,24 +228,22 @@ for n in range(0,10):
     if best_acc < metrics_test[0]:
         best_acc = metrics_test[0]
         best_acc_epoch = epoch
-  
+
+        print("\nSaving best model")
+        net.eval()
+        path = f'Model_fcn3_{n}.pt'
+        torch.save(net.state_dict(), path)
+
+        model = Net()
+        path_whole = f'Model_fcn3_{n}w.pt'
+        torch.save(model, path_whole) 
+
   time_end = time.time()
   elapsed_time = time_end - time_start
   print(f"Train cost time = {elapsed_time: .6f}", )
-
-  # 5. save model
-  print("\nSaving trained model state_dict ")
-  net.eval()
-  path = f'Model_fcn3_{n}.pt'
-  torch.save(net.state_dict(), path)
-
-  model = Net()
-  path_whole = f'Model_fcn3_{n}w.pt'
-  torch.save(model, path_whole) 
-
+ 
   test_acc.append(best_acc)
   best_epoch.append(best_acc_epoch)
-
   print(f"Dataset {n} - Accuracy: {test_acc[-1]}, Best Epoch: {best_epoch[-1]}")
 
 print("\n")  
