@@ -218,7 +218,7 @@ for n in range(0,10):
         f"mcc = {metrics_train[4]:0.4f}")
 
     metrics_test = metrics(net, test_ds, thresh=0.5)
-    print("Metrics for test data: "
+    print("Metrics for test data:  "
         f"accuracy = {metrics_test[0]:0.4f}, "
         f"precision = {metrics_test[1]:0.4f}, "
         f"recall = {metrics_test[2]:0.4f}, "
