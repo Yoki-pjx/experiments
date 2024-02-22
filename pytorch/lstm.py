@@ -21,7 +21,6 @@ print(device)
 in_dim = 20
 hidden_dim = 16
 num_layers = 1
-
 bidirectional = True
 num_classes = 2
 batch_size = 256
@@ -79,28 +78,39 @@ class lstm(nn.Module):
 
         self.lstm = nn.LSTM(input_size=self.in_dim, hidden_size=self.hidden_dim, num_layers=self.num_layers, dropout=self.dropout/2, bidirectional=self.bidirectional,
                             batch_first=True)
-        self.gru = nn.GRU(self.hidden_dim * 2, self.hidden_dim, bidirectional=self.bidirectional, batch_first=True)
+        # self.gru = nn.GRU(self.hidden_dim * 2, self.hidden_dim, bidirectional=self.bidirectional, batch_first=True)
 
 
         self.fc = nn.Sequential(
-            nn.Linear(128, int(hidden_dim)),
+            nn.Linear(64, int(hidden_dim)),
             nn.SELU(True),
             nn.Dropout(p=dropout),
             nn.Linear(int(hidden_dim), num_classes),
         )
 
+    # def forward(self, x):
+
+    #     x = x.permute(2, 0, 1)
+    #     lstm_out, _ = self.lstm(x)
+    #     gru_out, _ = self.gru(lstm_out)
+    #     avg_pool_l = torch.mean(lstm_out.permute(1, 0, 2), 1)
+    #     max_pool_l, _ = torch.max(lstm_out.permute(1, 0, 2), 1)
+        
+    #     avg_pool_g = torch.mean(gru_out.permute(1, 0, 2), 1)
+    #     max_pool_g, _ = torch.max(gru_out.permute(1, 0, 2), 1)
+
+    #     x = torch.cat((avg_pool_g, max_pool_g, avg_pool_l, max_pool_l), 1)
+    #     y = self.fc(x)
+        
+    #     return y
     def forward(self, x):
 
         x = x.permute(2, 0, 1)
         lstm_out, _ = self.lstm(x)
-        gru_out, _ = self.gru(lstm_out)
         avg_pool_l = torch.mean(lstm_out.permute(1, 0, 2), 1)
         max_pool_l, _ = torch.max(lstm_out.permute(1, 0, 2), 1)
         
-        avg_pool_g = torch.mean(gru_out.permute(1, 0, 2), 1)
-        max_pool_g, _ = torch.max(gru_out.permute(1, 0, 2), 1)
-
-        x = torch.cat((avg_pool_g, max_pool_g, avg_pool_l, max_pool_l), 1)
+        x = torch.cat((avg_pool_l, max_pool_l), 1)
         y = self.fc(x)
         
         return y
