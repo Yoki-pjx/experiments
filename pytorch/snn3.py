@@ -330,8 +330,8 @@ for n in range(0,10):
         MAE_recd.append(mae)
 
 
-        print(f'epoch {epoch} train_loss ={train_loss: .6f}, train_acc ={train_acc: .6f}, test_loss ={test_loss: .6f}, test_acc ={test_acc: .6f}')
-        print(f'epoch {epoch} test_loss = {test_loss: .4f}, test_acc = {test_acc: .4f}, precision = {precision: .4f}, recall = {recall: .4f}, F1 = {f1: .4f}, MCC = {mcc: .4f}, MAE = {mae: .4f}')
+        print(f'epoch {epoch} train loss ={train_loss: .6f}, train acc ={train_acc: .6f}, test loss ={test_loss: .6f}, test acc ={test_acc: .6f}')
+        print(f'epoch {epoch} test loss = {test_loss: .4f}, acc = {test_acc: .4f}, precision = {precision: .4f}, recall = {recall: .4f}, F1 = {f1: .4f}, MCC = {mcc: .4f}, MAE = {mae: .4f}')
         print(f'train speed ={train_speed: .4f} entires/s, test speed ={test_speed: .4f} entires/s\n')
         # print(f'escape time = {(datetime.datetime.now() + datetime.timedelta(seconds=(time.time() - start_time) * (epochs - epoch))).strftime("%Y-%m-%d %H:%M:%S")}\n')
  
@@ -339,7 +339,7 @@ for n in range(0,10):
     elapsed_time = end_time - start_time
     print(f"The operation took {elapsed_time: .6f} seconds.")
 
-    print(f'\nmax_test_acc ={max_test_acc: .6f} at epoch {max_acc_epoch}')
+    print(f'\nbest accuracy ={max_test_acc: .6f} at epoch {max_acc_epoch}')
 
     print(f'Avg. test_acc = {np.mean(acc_recd): .4f}, precision = {np.mean(prec_recd): .4f}, recall = {np.mean(recall_recd): .4f}, F1 = {np.mean(F1_recd): .4f}, MCC = {np.mean(MCC_recd): .4f}, MAE = {np.mean(MAE_recd): .4f}')
     print('--------------------------------------------------')
