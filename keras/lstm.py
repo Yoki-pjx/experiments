@@ -56,8 +56,8 @@ def data_load(n):
     # trainX = transpose(trainX, (2, 0, 1))
     trainX = array(trainX)
     trainy = read_csv(filepath + train_Y, delim_whitespace=True)
-    # print('train shape:',trainX.shape, trainy.shape)
     trainy = to_categorical(trainy)
+    print('train shape:',trainX.shape, trainy.shape)
 
     # load test data
     test_X = f'test_x_{n}.csv'
