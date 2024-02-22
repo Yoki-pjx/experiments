@@ -3,15 +3,9 @@ import pandas as pd
 import time
 import torch
 import random
-from torch.utils.data import TensorDataset, DataLoader, Dataset
 import torch.nn as nn
-import torch.nn.functional as F
-import torchvision
-import torchvision.transforms as transforms
-import torch.optim as optim
 from torch.optim import lr_scheduler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef, mean_absolute_error
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import StratifiedKFold, KFold, RepeatedKFold, train_test_split, GroupKFold, GroupShuffleSplit
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -248,3 +242,5 @@ def train_net_folds(X, X_test, y, folds, batch_size, patience, verbose):
 n_fold = 2
 folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
 oof, prediction = train_net_folds(trainX, testX, trainY, folds, batch_size, patience, True)
+
+print(oof, prediction)
