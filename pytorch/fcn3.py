@@ -170,7 +170,9 @@ for n in range(0,10):
   # train network
   loss_func = torch.nn.BCELoss()  # binary cross entropy
   # loss_func = torch.nn.MSELoss()
-  optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
+  optimizer = torch.optim.Adam(net.parameters(), lr=lrn_rate)
+  # optimizer = torch.optim.SGD(net.parameters(), lr=lrn_rate)
+ 
   print(f"Loss function: {loss_func}, "
         f"Optimizer: {optimizer.__class__.__name__}, "
         f"Learn rate: {lrn_rate:0.4f}, "
