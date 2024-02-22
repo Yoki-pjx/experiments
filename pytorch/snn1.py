@@ -297,11 +297,11 @@ for n in range(0,10):
             # save model
             print("\nSaving trained model state_dict ")
             net.eval()
-            path = f'Model_basic_snn3_{n}.pt'
+            path = f'Model_basic_snn1_{n}.pt'
             torch.save(net.state_dict(), path)
 
             model = SNN(tau=tau)
-            path_whole1 = f'Model_basic_snn3_{n}w.pt'
+            path_whole1 = f'Model_basic_snn1_{n}w.pt'
             torch.save(model, path_whole1)  
 
         # checkpoint = {
