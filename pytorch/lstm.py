@@ -49,15 +49,15 @@ def groupdata(data, sequence_length):
     grouped_data = [data[i*16:(i+1)*16].values.T for i in range(num_groups)]
     return np.array(grouped_data, dtype='float32')
 
-trainX_file = f'./Data/time_series/k-fold/whole_block/train_x_{n}.csv'
-testX_file = f'./Data/time_series/k-fold/whole_block/test_x_{n}.csv'  
+trainX_file = f'../Data/time_series/k-fold/whole_block/train_x_{n}.csv'
+testX_file = f'../Data/time_series/k-fold/whole_block/test_x_{n}.csv'  
 trainX = pd.read_csv(trainX_file, header=None, skiprows=1, usecols=range(20))
 testX = pd.read_csv(testX_file, header=None, skiprows=1, usecols=range(20))
 trainX = groupdata(trainX, sequence_length)
 testX = groupdata(testX, sequence_length)
 
-trainY_file = f'./Data/time_series/k-fold/whole_block/train_y_{n}.csv'
-testY_file = f'./Data/time_series/k-fold/whole_block/test_y_{n}.csv'
+trainY_file = f'../Data/time_series/k-fold/whole_block/train_y_{n}.csv'
+testY_file = f'../Data/time_series/k-fold/whole_block/test_y_{n}.csv'
 trainY = pd.read_csv(trainY_file, header=None, skiprows=1)
 testY = pd.read_csv(testY_file, header=None, skiprows=1)
 trainY = trainY.values.flatten()
@@ -168,7 +168,7 @@ def train_net(train_loader, val_loader, patience, model, loss_func, optimizer, s
         valid_loss = np.mean(val_loss)
         if valid_loss <= valid_loss_min:
             # print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(valid_loss_min, valid_loss))
-            torch.save(model.state_dict(), 'model.pt')
+            # torch.save(model.state_dict(), 'model.pt')
             valid_loss_min = valid_loss
             p = 0
 
@@ -184,8 +184,8 @@ def train_net(train_loader, val_loader, patience, model, loss_func, optimizer, s
         if stop:
             break
 
-    checkpoint = torch.load('model.pt')      
-    model.load_state_dict(checkpoint)
+    # checkpoint = torch.load('model.pt')      
+    # model.load_state_dict(checkpoint)
         
     return model
 
