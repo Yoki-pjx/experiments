@@ -149,7 +149,7 @@ setup_seed(seed)
 test_acc = []
 best_epoch = []
 
-for n in range(0,5):
+for n in range(0,10):
     valid_loss_min = np.Inf
     patience = patience
     # current number of epochs, where validation loss didn't increase
@@ -158,6 +158,7 @@ for n in range(0,5):
     stop = False
     best_acc = -1
     best_acc_epoch = 0
+    time_start = time.time()
     
     model, loss_func, optimizer, scheduler = initialize_model(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size, lrn_rate)
 
@@ -257,7 +258,7 @@ for n in range(0,5):
         if best_acc < valid_acc:
             best_acc = valid_acc
             best_acc_epoch = epoch
-            
+
             print(f'\nEpoch {epoch}, train loss: {np.mean(train_loss):.6f}, valid loss: {np.mean(val_loss):.6f}, train acc: {np.mean(train_acc):.6f}, valid acc: {np.mean(val_acc):.6f}')
             print("\nSaving best model..")
             model.eval()
@@ -268,6 +269,10 @@ for n in range(0,5):
             path_whole = f'Model_lstm3_{n}w.pt'
             torch.save(model, path_whole) 
 
+    time_end = time.time()
+    elapsed_time = time_end - time_start
+    print(f"Train cost time = {elapsed_time: .6f}", )
+
     test_acc.append(best_acc)
     best_epoch.append(best_acc_epoch)
     print(f"\nDataset {n} - Accuracy: {best_acc:.6f}, Best Epoch: {best_acc_epoch}")
@@ -275,7 +280,10 @@ for n in range(0,5):
         # Checkpoint
         # checkpoint = torch.load('model.pt')      
         # model.load_state_dict(checkpoint)
+    
     print('--' * 30)
+
+
 
 print("\n") 
 for n, (acc, epoch) in enumerate(zip(test_acc, best_epoch)):
