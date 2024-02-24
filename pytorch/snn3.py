@@ -301,7 +301,7 @@ for n in range(0,10):
             save_max = True
 
             # save model
-            print("\nSaving trained model state_dict ")
+            # print("\nSaving trained model state_dict ")
             net.eval()
             path = f'Model_basic_snn3_{n}.pt'
             torch.save(net.state_dict(), path)
