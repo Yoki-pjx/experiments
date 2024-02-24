@@ -52,15 +52,15 @@ def groupdata(data, sequence_length):
     return np.array(grouped_data, dtype='float32')
 
 def data_load(n):
-    trainX_file = f'./Data/time_series/k-fold/whole_block/train_x_{n}.csv'
-    testX_file = f'./Data/time_series/k-fold/whole_block/test_x_{n}.csv'  
+    trainX_file = f'../Data/time_series/k-fold/whole_block/train_x_{n}.csv'
+    testX_file = f'../Data/time_series/k-fold/whole_block/test_x_{n}.csv'  
     trainX = pd.read_csv(trainX_file, header=None, skiprows=1, usecols=range(20))
     testX = pd.read_csv(testX_file, header=None, skiprows=1, usecols=range(20))
     trainX = groupdata(trainX, sequence_length)
     testX = groupdata(testX, sequence_length)
 
-    trainY_file = f'./Data/time_series/k-fold/whole_block/train_y_{n}.csv'
-    testY_file = f'./Data/time_series/k-fold/whole_block/test_y_{n}.csv'
+    trainY_file = f'../Data/time_series/k-fold/whole_block/train_y_{n}.csv'
+    testY_file = f'../Data/time_series/k-fold/whole_block/test_y_{n}.csv'
     trainY = pd.read_csv(trainY_file, header=None, skiprows=1)
     testY = pd.read_csv(testY_file, header=None, skiprows=1)
     trainY = trainY.values.flatten()
