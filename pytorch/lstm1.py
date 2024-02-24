@@ -15,7 +15,7 @@ seed = 166
 
 in_dim = 20
 hidden_dim = 16
-num_layers = 3
+num_layers = 1
 bidirectional = True
 num_classes = 2
 
@@ -44,6 +44,9 @@ def setup_seed(seed):
 
 # ---------------------------------------------------------
 
+def min_max_normalize(df):
+    return (df - df.min()) / (df.max() - df.min())
+
 def groupdata(data, sequence_length):
     num_samples = len(data)
     num_groups = num_samples // sequence_length
@@ -58,6 +61,9 @@ def data_load(n):
     testX = pd.read_csv(testX_file, header=None, skiprows=1, usecols=range(20))
     trainX = groupdata(trainX, sequence_length)
     testX = groupdata(testX, sequence_length)
+
+    trainX = min_max_normalize(trainX)
+    testX = min_max_normalize(testX)
 
     trainY_file = f'../Data/time_series/k-fold/whole_block/train_y_{n}.csv'
     testY_file = f'../Data/time_series/k-fold/whole_block/test_y_{n}.csv'
@@ -262,11 +268,11 @@ for n in range(0,10):
             print(f'\nEpoch {epoch}, train loss: {np.mean(train_loss):.6f}, valid loss: {np.mean(val_loss):.6f}, train acc: {np.mean(train_acc):.6f}, valid acc: {np.mean(val_acc):.6f}')
             print("\nSaving best model..")
             model.eval()
-            path = f'Model_lstm3_{n}.pt'
+            path = f'Model_lstm1_{n}.pt'
             torch.save(model.state_dict(), path)
 
             model = lstm(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size)
-            path_whole = f'Model_lstm3_{n}w.pt'
+            path_whole = f'Model_lstm1_{n}w.pt'
             torch.save(model, path_whole) 
 
     time_end = time.time()
