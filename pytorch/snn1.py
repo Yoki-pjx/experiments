@@ -45,36 +45,19 @@ def setup_seed(seed):
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
 
-# # Max-min normalization
-# class MyDataset(Dataset):
-#     def __init__(self, src_file):
-#         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
-        
-#         # Calculate min and max for each feature (column)
-#         min_values = np.min(all_data[:, 0:20], axis=0)
-#         max_values = np.max(all_data[:, 0:20], axis=0)
-        
-#         # Apply max-min normalization for each feature (column)
-#         normalized_data = (all_data[:, 0:20] - min_values) / (max_values - min_values)
-        
-#         self.x_data = torch.tensor(normalized_data, dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
-        
-#         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
-
-#     def __len__(self):
-#         return len(self.x_data)
-
-#     def __getitem__(self, idx):
-#         feats = self.x_data[idx]  # idx row, all 20 cols, with an extra dimension
-#         sex = self.y_data[idx]    # idx row, the only col, with an extra dimension
-#         return feats, sex
-
-# Raw data
+# Max-min normalization
 class MyDataset(Dataset):
     def __init__(self, src_file):
         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
-       
-        self.x_data = torch.tensor(all_data[:, 0:20], dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
+        
+        # Calculate min and max for each feature (column)
+        min_values = np.min(all_data[:, 0:20], axis=0)
+        max_values = np.max(all_data[:, 0:20], axis=0)
+        
+        # Apply max-min normalization for each feature (column)
+        normalized_data = (all_data[:, 0:20] - min_values) / (max_values - min_values)
+        
+        self.x_data = torch.tensor(normalized_data, dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
         
         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
 
@@ -82,9 +65,26 @@ class MyDataset(Dataset):
         return len(self.x_data)
 
     def __getitem__(self, idx):
-        feats = self.x_data[idx]  
-        sex = self.y_data[idx]    
+        feats = self.x_data[idx]  # idx row, all 20 cols, with an extra dimension
+        sex = self.y_data[idx]    # idx row, the only col, with an extra dimension
         return feats, sex
+
+# # Raw data
+# class MyDataset(Dataset):
+#     def __init__(self, src_file):
+#         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
+       
+#         self.x_data = torch.tensor(all_data[:, 0:20], dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
+        
+#         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
+
+#     def __len__(self):
+#         return len(self.x_data)
+
+#     def __getitem__(self, idx):
+#         feats = self.x_data[idx]  
+#         sex = self.y_data[idx]    
+#         return feats, sex
 
 class SNN(nn.Module):
     def __init__(self, tau):
