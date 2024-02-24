@@ -15,7 +15,7 @@ seed = 166
 
 in_dim = 20
 hidden_dim = 16
-num_layers = 3
+num_layers = 1
 bidirectional = True
 num_classes = 2
 
@@ -85,10 +85,10 @@ def data_load(n):
 
 # ---------------------------------------------------------
 
-class lstm(nn.Module):
+class rnn(nn.Module):
 
     def __init__(self, in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size):
-        super(lstm, self).__init__()
+        super(rnn, self).__init__()
         self.in_dim = in_dim
         self.hidden_dim = hidden_dim
         self.batch_size = batch_size
@@ -97,8 +97,7 @@ class lstm(nn.Module):
         self.num_layers = num_layers
         self.dropout = dropout
 
-        self.lstm = nn.LSTM(input_size=self.in_dim, hidden_size=self.hidden_dim, num_layers=self.num_layers, dropout=self.dropout/2, bidirectional=self.bidirectional,
-                            batch_first=True)
+        self.rnn = nn.RNN(input_size=self.in_dim, hidden_size=self.hidden_dim, num_layers=self.num_layers, dropout=self.dropout/2, bidirectional=self.bidirectional,)
         # self.gru = nn.GRU(self.hidden_dim * 2, self.hidden_dim, bidirectional=self.bidirectional, batch_first=True)
 
 
@@ -130,9 +129,9 @@ class lstm(nn.Module):
     def forward(self, x):
 
         x = x.permute(2, 0, 1)
-        lstm_out, _ = self.lstm(x)
-        avg_pool_l = torch.mean(lstm_out.permute(1, 0, 2), 1)
-        max_pool_l, _ = torch.max(lstm_out.permute(1, 0, 2), 1)
+        rnn_out, _ = self.rnn(x)
+        avg_pool_l = torch.mean(rnn_out.permute(1, 0, 2), 1)
+        max_pool_l, _ = torch.max(rnn_out.permute(1, 0, 2), 1)
         
         x = torch.cat((avg_pool_l, max_pool_l), 1)
         y = self.fc(x)
@@ -142,7 +141,7 @@ class lstm(nn.Module):
 # --------------------------------------------------------- 
     
 def initialize_model(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size, lrn_rate):
-    model = lstm(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size)
+    model = rnn(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size)
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lrn_rate)
     model.to(device)
@@ -268,11 +267,11 @@ for n in range(0,10):
             print(f'\nEpoch {epoch}, train loss: {np.mean(train_loss):.6f}, valid loss: {np.mean(val_loss):.6f}, train acc: {np.mean(train_acc):.6f}, valid acc: {np.mean(val_acc):.6f}')
             # print("\nSaving best model..")
             model.eval()
-            path = f'Model_lstm3_{n}.pt'
+            path = f'Model_rnn1_{n}.pt'
             torch.save(model.state_dict(), path)
 
-            model = lstm(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size)
-            path_whole = f'Model_lstm3_{n}w.pt'
+            model = rnn(in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size)
+            path_whole = f'Model_rnn1_{n}w.pt'
             torch.save(model, path_whole) 
 
     time_end = time.time()
