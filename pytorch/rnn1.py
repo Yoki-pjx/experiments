@@ -59,11 +59,12 @@ def data_load(n):
     testX_file = f'../Data/time_series/k-fold/whole_block/test_x_{n}.csv'  
     trainX = pd.read_csv(trainX_file, header=None, skiprows=1, usecols=range(20))
     testX = pd.read_csv(testX_file, header=None, skiprows=1, usecols=range(20))
-    trainX = groupdata(trainX, sequence_length)
-    testX = groupdata(testX, sequence_length)
 
     trainX = min_max_normalize(trainX)
     testX = min_max_normalize(testX)
+
+    trainX = groupdata(trainX, sequence_length)
+    testX = groupdata(testX, sequence_length)
 
     trainY_file = f'../Data/time_series/k-fold/whole_block/train_y_{n}.csv'
     testY_file = f'../Data/time_series/k-fold/whole_block/test_y_{n}.csv'
