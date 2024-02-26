@@ -42,8 +42,8 @@ def groupdata(data):
 
 
 def data_load(n):
-    trainX_file = f'F:/PhD_experiments/experiments/Data/20x20/k-fold/train_x_{n}.csv'
-    testX_file = f'F:/PhD_experiments/experiments/Data/20x20/k-fold/test_x_{n}.csv'  
+    trainX_file = f'../Data/20x20/k-fold/train_x_{n}.csv'
+    testX_file = f'../Data/20x20/k-fold/test_x_{n}.csv'  
     trainX = pd.read_csv(trainX_file, header=None, skiprows=1, usecols=range(20))
     testX = pd.read_csv(testX_file, header=None, skiprows=1, usecols=range(20))
 
@@ -53,8 +53,8 @@ def data_load(n):
     trainX = groupdata(trainX)
     testX = groupdata(testX)
 
-    trainY_file = f'F:/PhD_experiments/experiments/Data/20x20/k-fold/train_y_{n}.csv'
-    testY_file = f'F:/PhD_experiments/experiments/Data/20x20/k-fold/test_y_{n}.csv' 
+    trainY_file = f'../Data/20x20/k-fold/train_y_{n}.csv'
+    testY_file = f'../Data/20x20/k-fold/test_y_{n}.csv' 
     trainY = pd.read_csv(trainY_file, header=None, skiprows=1)
     testY = pd.read_csv(testY_file, header=None, skiprows=1)
     trainY = trainY.values.flatten()
