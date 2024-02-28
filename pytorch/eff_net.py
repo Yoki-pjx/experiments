@@ -119,7 +119,7 @@ test_acc = []
 best_epoch = []
 
 
-for n in range(0,1):
+for n in range(1,10):
     best_acc = -1
     best_acc_epoch = 0
     time_start = time.time()
@@ -221,6 +221,13 @@ for n in range(0,1):
             best_acc_epoch = epoch
             # print(f'\nEpoch {epoch}, train loss: {np.mean(train_loss):.6f}, valid loss: {np.mean(val_loss):.6f}, train acc: {np.mean(train_acc):.6f}, valid acc: {np.mean(val_acc):.6f}')
             # print("\nSaving best model..")
+            print("Metrics for test data:  "
+            f"accuracy = {np.mean(val_acc):.4f}, "
+            f"precision = {np.mean(val_prec):.4f}, "
+            f"recall = {np.mean(val_recall):.4f}, "
+            f"F1 = {np.mean(val_F1):.4f}, "
+            f"mcc = {np.mean(val_mcc):.4f}, "
+            f"mae = {np.mean(val_mae):.4f}")
             model.eval()
             path = f'Model_effs_{n}.pt'
             torch.save(model.state_dict(), path)
