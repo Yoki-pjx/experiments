@@ -19,7 +19,7 @@ num_layers = 1
 bidirectional = True
 num_classes = 2
 
-epochs = 2000
+epochs = 5000
 batch_size = 256
 lrn_rate = 0.005
 sequence_length = 16
