@@ -27,39 +27,20 @@ def setup_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 # Load dataset
-# class MyDataset(Dataset):
-#     def __init__(self, src_file):
-#         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
-
-#         # Calculate min and max for each feature (column)
-#         min_values = np.min(all_data[:, 0:20], axis=0)
-#         max_values = np.max(all_data[:, 0:20], axis=0)
-        
-#         # Apply max-min normalization for each feature (column)
-#         normalized_data = (all_data[:, 0:20] - min_values) / (max_values - min_values)
-        
-#         self.x_data = torch.tensor(normalized_data, dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
-        
-#         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
-
-#     def __len__(self):
-#         return len(self.x_data)
-
-#     def __getitem__(self, idx):
-#         feats = self.x_data[idx]  
-#         sex = self.y_data[idx]    
-#         return feats, sex
-    
-# Load dataset
 class MyDataset(Dataset):
     def __init__(self, src_file):
         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
-       
-        self.x_data = torch.tensor(all_data[:, 0:20], dtype=torch.float32).to(device)
+
+        # Calculate min and max for each feature (column)
+        min_values = np.min(all_data[:, 0:20], axis=0)
+        max_values = np.max(all_data[:, 0:20], axis=0)
+        
+        # Apply max-min normalization for each feature (column)
+        normalized_data = (all_data[:, 0:20] - min_values) / (max_values - min_values)
+        
+        self.x_data = torch.tensor(normalized_data, dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
         
         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
-
-        self.y_data = self.y_data.reshape(-1,1)  # 2-D required
 
     def __len__(self):
         return len(self.x_data)
@@ -68,6 +49,25 @@ class MyDataset(Dataset):
         feats = self.x_data[idx]  
         sex = self.y_data[idx]    
         return feats, sex
+    
+# Load dataset
+# class MyDataset(Dataset):
+#     def __init__(self, src_file):
+#         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
+       
+#         self.x_data = torch.tensor(all_data[:, 0:20], dtype=torch.float32).to(device)
+        
+#         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
+
+#         self.y_data = self.y_data.reshape(-1,1)  # 2-D required
+
+#     def __len__(self):
+#         return len(self.x_data)
+
+#     def __getitem__(self, idx):
+#         feats = self.x_data[idx]  
+#         sex = self.y_data[idx]    
+#         return feats, sex
 
 # ---------------------------------------------------------
 
@@ -157,7 +157,7 @@ best_epoch = []
 
 print("\nCreating 20-(64-32-16)-1 binary FCN classifier \n")
 
-for n in range(0,10):
+for n in range(0,5):
   best_acc = 0
   best_acc_epoch = 0
   setup_seed(seed)
@@ -233,11 +233,11 @@ for n in range(0,10):
 
         print("\nSaving best model")
         net.eval()
-        path = f'Model_fcn3_{n}.pt'
+        path = f'Model_fcn3_maxmin_{n}.pt'
         torch.save(net.state_dict(), path)
 
         model = Net()
-        path_whole = f'Model_fcn3_{n}w.pt'
+        path_whole = f'Model_fcn3_maxmin_{n}w.pt'
         torch.save(model, path_whole) 
 
   time_end = time.time()
