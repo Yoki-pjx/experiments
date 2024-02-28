@@ -38,9 +38,11 @@ class MyDataset(Dataset):
         # Apply max-min normalization for each feature (column)
         normalized_data = (all_data[:, 0:20] - min_values) / (max_values - min_values)
         
-        self.x_data = torch.tensor(normalized_data, dtype=torch.float32).unsqueeze(1).unsqueeze(1).to(device)
+        self.x_data = torch.tensor(normalized_data, dtype=torch.float32).to(device)
         
         self.y_data = torch.tensor(all_data[:, 20], dtype=torch.float32).to(device)  # float32 required
+
+        self.y_data = self.y_data.reshape(-1,1)  # 2-D required
 
     def __len__(self):
         return len(self.x_data)
