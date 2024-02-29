@@ -5,6 +5,7 @@ import math
 import random
 import numpy as np
 from torch.utils.data import Dataset
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef, mean_absolute_error
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # Assuming that we are on a CUDA machine, this should print a CUDA device:
@@ -200,6 +201,8 @@ for n in range(0,5):
     # ---------------------------------------------------------
 
     # evaluate model
+    val_mae = []
+
     net.eval()
     total_test_loss = 0
     with torch.no_grad():
@@ -208,6 +211,10 @@ for n in range(0,5):
             output = net(data)
             loss = loss_func(output, target)
             total_test_loss += loss.item()
+
+            a = target.data.cpu().numpy()
+            b = output.detach().cpu().numpy().argmax(1)
+            val_mae.append(mean_absolute_error(a, b))
     
     avg_test_loss = total_test_loss / len(test_loader.dataset)
 
@@ -227,13 +234,14 @@ for n in range(0,5):
         f"precision = {metrics_test[1]:0.4f}, "
         f"recall = {metrics_test[2]:0.4f}, "
         f"F1 = {metrics_test[3]:0.4f}, "
-        f"mcc = {metrics_test[4]:0.4f}")
+        f"mcc = {metrics_test[4]:0.4f}, "
+        f"mae = {np.mean(val_mae):.4f}")
 
     if best_acc < metrics_test[0]:
         best_acc = metrics_test[0]
         best_acc_epoch = epoch
 
-        print("\nSaving best model")
+        # print("\nSaving best model")
         net.eval()
         path = f'Model_fcn3_maxmin_{n}.pt'
         torch.save(net.state_dict(), path)
