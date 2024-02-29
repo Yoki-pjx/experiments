@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
-from torchvision.models import efficientnet_v2_s, EfficientNet_V2_S_Weights
+from torchvision.models import efficientnet_v2_s, efficientnet_v2_l, EfficientNet_V2_S_Weights
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef, mean_absolute_error
@@ -17,7 +17,7 @@ print(device)
 
 num_epochs = 200
 batch_size = 256
-lrn_rate = 0.001
+lrn_rate = 0.005
 seed = 166
 # ---------------------------------------------------------
 
@@ -95,7 +95,7 @@ def data_load(n):
 # # print(model)
 
 def initialize_model(lrn_rate):
-    model = efficientnet_v2_s()
+    model = efficientnet_v2_l()
 
     first_conv_layer = model.features[0][0]
     model.features[0][0] = nn.Conv2d(1, first_conv_layer.out_channels,
@@ -106,7 +106,8 @@ def initialize_model(lrn_rate):
     model.classifier[1] = nn.Linear(num_ftrs, 2) 
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=lrn_rate, momentum=0.9)
+    # optimizer = optim.SGD(model.parameters(), lr=lrn_rate, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=lrn_rate)
     model.to(device)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.75, verbose=True)
     return model, criterion, optimizer, scheduler
@@ -119,7 +120,7 @@ test_acc = []
 best_epoch = []
 
 
-for n in range(1,10):
+for n in range(0,10):
     best_acc = -1
     best_acc_epoch = 0
     time_start = time.time()
