@@ -21,7 +21,7 @@ ngen = 100
 max_depth = 17
 
 # load dataset
-data = pd.read_csv("../Data/total_data.csv.csv")  
+data = pd.read_csv("../Data/total_data.csv")  
 x_values = data.iloc[:, :20].values  
 y_values = data.iloc[:, 20].values
 
