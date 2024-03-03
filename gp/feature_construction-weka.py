@@ -17,7 +17,7 @@ crossover_pb = 0.9
 mutation_pb = 0.1
 frac_elitist = 0.1
 n_feature = 5
-ngen = 100
+ngen = 50
 max_depth = 17
 
 # load dataset
@@ -47,7 +47,7 @@ def evalFeatureEngineering(individuals):
     
     # Decision Tree Classifier
     evl_scores = WeakClassifier.REPTree(new_features, y_values)
-    print(evl_scores)
+    # print(evl_scores)
 
     del new_features
     gc.collect()
