@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
-from torchvision.models import efficientnet_v2_s, efficientnet_v2_l, EfficientNet_V2_S_Weights
+from torchvision.models import efficientnet_v2_s, efficientnet_v2_l, efficientnet_b0
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef, mean_absolute_error
@@ -95,7 +95,7 @@ def data_load(n):
 # # print(model)
 
 def initialize_model(lrn_rate):
-    model = efficientnet_v2_l()
+    model = efficientnet_b0()
 
     first_conv_layer = model.features[0][0]
     model.features[0][0] = nn.Conv2d(1, first_conv_layer.out_channels,
