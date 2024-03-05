@@ -10,20 +10,23 @@ from deap import base, creator, tools, gp, algorithms
 import weka.core.jvm as jvm
 import WeakClassifier
 
-# 遗传算法参数
+# parameters
 random.seed(166)
 pop_size = 500
 crossover_pb = 0.9
 mutation_pb = 0.1
 frac_elitist = 0.1
 n_feature = 5
-ngen = 50
+ngen = 200
 max_depth = 17
 
 # load dataset
 data = pd.read_csv("../Data/total_data.csv")  
+
 x_values = data.iloc[:, :20].values  
 y_values = data.iloc[:, 20].values
+
+print('Dataset loaded...')
 
 # Create a class of fitness and a class of individuals, with individuals consisting of multiple trees
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -32,29 +35,50 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 jvm.start(system_cp=True, packages=True)
 
 # Baseline calculation
+print('Modeling the baseline...')
 scores_base = WeakClassifier.REPTree(x_values, y_values)
 
 # The goal of solving the problem is to maximize classification accuracy
-def evalFeatureEngineering(individuals):
-    # Creating new features
-    new_features = []
-    for ind_num, ind in enumerate(individuals):
-        func = gp.compile(expr=ind, pset=pset)
-        new_features.append([func(*record) for record in x_values])
+# def evalFeatureEngineering(individuals):
+#     # Creating new features
+#     new_features = []
+#     for ind_num, ind in enumerate(individuals):
+#         func = gp.compile(expr=ind, pset=pset)
+#         new_features.append([func(*record) for record in x_values])
     
-    # Transpose New Feature Array
-    new_features = np.transpose(np.array(new_features))
+#     # Transpose New Feature Array
+#     new_features = np.transpose(np.array(new_features))
     
-    # Decision Tree Classifier
-    evl_scores = WeakClassifier.REPTree(new_features, y_values)
-    # print(evl_scores)
+#     # Decision Tree Classifier
+#     evl_scores = WeakClassifier.REPTree(new_features, y_values)
+#     print(evl_scores)
 
-    del new_features
-    gc.collect()
+#     del new_features
+#     gc.collect()
    
-    # Returns accuracy
-    return evl_scores
+#     # Returns accuracy
+#     return [evl_scores]
 
+def evalFeatureEngineering(individuals):
+    try:
+        # Creating new features
+        new_features = []
+        for ind_num, ind in enumerate(individuals):
+            func = gp.compile(expr=ind, pset=pset)
+            new_features.append([func(*record) for record in x_values])
+        
+        # Transpose New Feature Array
+        new_features = np.transpose(np.array(new_features))
+        
+        # Decision Tree Classifier
+        evl_scores = WeakClassifier.REPTree(new_features, y_values)
+        print(evl_scores)
+    finally:
+        del new_features
+        gc.collect()
+    
+    # Returns accuracy
+    return [evl_scores]
 
 # Define new functions
 # def protectedDiv(left, right):
@@ -80,7 +104,7 @@ def great(left, right):
 #     else:
 #         return 0        
 
-# 创建GP框架的基本组件
+# GP setting
 pset = gp.PrimitiveSet("MAIN", x_values.shape[1])
 pset.addPrimitive(operator.add, 2)
 pset.addPrimitive(operator.sub, 2)
@@ -88,8 +112,8 @@ pset.addPrimitive(operator.sub, 2)
 # pset.addPrimitive(operator.neg, 1)
 # pset.addPrimitive(operator.abs, 1)
 # pset.addPrimitive(protectedDiv, 2)
-pset.addPrimitive(less, 2)
-pset.addPrimitive(great, 2)
+pset.addPrimitive(max, 2)
+pset.addPrimitive(min, 2)
 # pset.addPrimitive(equal, 2)
 
 def low_precision_random():
@@ -159,7 +183,9 @@ pop, log = algorithms.eaSimple(population, toolbox,
 
 jvm.stop()
 
-print(f'Weka.REPTree p {pop_size}, ngen {ngen}, crossover {crossover_pb}, mutation {mutation_pb}, Elitist {frac_elitist}, feature {n_feature}')
+print('--' * 30)
+
+print(f'\nWeka.REPTree p {pop_size}, ngen {ngen}, crossover {crossover_pb}, mutation {mutation_pb}, Elitist {frac_elitist}, feature {n_feature}')
 
 print('Log:')
 print(log)
