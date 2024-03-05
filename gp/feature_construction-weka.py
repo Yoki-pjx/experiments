@@ -140,7 +140,7 @@ def cxOnePointListOfTrees(ind1, ind2, max_depth=max_depth):
     original_ind2 = toolbox.clone(ind2)
 
     for tree1, tree2 in zip(ind1, ind2):
-        gp.cxOnePoint(tree1, tree2)
+        tree1, tree2 = gp.cxOnePoint(tree1, tree2)
         if tree1.height > max_depth or tree2.height > max_depth:
             # If the depth of any tree exceeds the limit, the original individual is restored
             return original_ind1, original_ind2
@@ -150,8 +150,8 @@ def mutUniformListOfTrees(individual, expr, pset, max_depth=max_depth):
     original_individual = toolbox.clone(individual)
 
     for tree in individual:
-        gp.mutUniform(tree, expr=expr, pset=pset)
-        if tree.height > max_depth:
+        mutated_tree, = gp.mutUniform(tree, expr=expr, pset=pset)
+        if mutated_tree.height > max_depth:
             # If the depth of the tree exceeds the limit, the original individual is restored
             return original_individual,
     return individual,
@@ -165,6 +165,7 @@ toolbox.register("mate", cxOnePointListOfTrees)
 toolbox.register("mutate", mutUniformListOfTrees, expr=toolbox.expr, pset=pset)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("compile", gp.compile, pset=pset)
+
 
 # Genetic Programming Algorithms
 population = toolbox.population(n=pop_size)
