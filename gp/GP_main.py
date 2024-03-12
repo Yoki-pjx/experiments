@@ -14,8 +14,8 @@ pop_size = 500
 crossover_pb = 0.9
 mutation_pb = 0.1
 frac_elitist = 0.1
-n_feature = 5
-ngen = 200
+n_feature = 10
+ngen = 30
 max_depth = 17
 
 # --------------------------------------------------------------------------
