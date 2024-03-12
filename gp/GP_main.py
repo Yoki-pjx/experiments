@@ -1,27 +1,26 @@
-import gc
-import operator
+import os, tempfile, json
+import subprocess
+
 import random
 import numpy as np
 import pandas as pd
-from functools import partial
 
+import operator
 from deap import base, creator, tools, gp, algorithms
 
-import weka.core.jvm as jvm
-import WeakClassifier
-
-# parameters
+# Parameters
 random.seed(166)
 pop_size = 500
 crossover_pb = 0.9
 mutation_pb = 0.1
 frac_elitist = 0.1
 n_feature = 5
-ngen = 200
+ngen = 100
 max_depth = 17
 
-# load dataset
+# Load dataset
 data = pd.read_csv("../Data/total_data.csv")  
+# data = pd.read_csv("./10k.csv")  
 
 x_values = data.iloc[:, :20].values  
 y_values = data.iloc[:, 20].values
@@ -32,11 +31,63 @@ print('Dataset loaded...')
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
-jvm.start(system_cp=True, packages=True)
+# Call subprocess
+def call_REPTree(x_values, y_values):
+    try:
+        # print("Preparing data for subprocess...")
+        x_file = tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.json')
+        y_file = tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.json')
 
-# Baseline calculation
-print('Modeling the baseline...')
-scores_base = WeakClassifier.REPTree(x_values, y_values)
+        # data to temp files
+        json.dump(x_values.tolist() if isinstance(x_values, np.ndarray) else x_values, x_file)
+        json.dump(y_values.tolist() if isinstance(y_values, np.ndarray) else y_values, y_file)
+        x_file_path = x_file.name
+        y_file_path = y_file.name
+        x_file.close()
+        y_file.close()
+
+        # creat temp file for score
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file_score = temp_file.name
+
+        # print("Starting subprocess...")
+        result = subprocess.Popen(['python', 
+                'REPTree.py', x_file_path, y_file_path, temp_file_score], 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                text=True)
+        
+        # stand output
+        # while True:
+        #     output = result.stdout.readline()
+        #     if output == '' and result.poll() is not None:
+        #         break
+        #     if output:
+        #         print(output.strip())
+
+        # # stand error
+        # stderr = result.stderr.read()
+        # if stderr:
+        #     print(stderr.strip())
+
+        # wait for subprocess
+        exit_code = result.wait()
+        # print(f"Subprocess finished with exit code {exit_code}")
+        # print("Subprocess finished.")
+
+        # reutn score
+        if result.returncode == 0:
+            with open(temp_file_score, 'r') as file:
+                score = float(file.read().strip()) 
+            # print("Received score from subprocess:", score)
+            return score
+        else:
+            raise Exception(f"Subprocess failed with: {result.stderr}")
+    finally:
+        # remove temp files
+        os.remove(x_file_path)
+        os.remove(y_file_path)
+        os.remove(temp_file_score)
 
 # The goal of solving the problem is to maximize classification accuracy
 # def evalFeatureEngineering(individuals):
@@ -60,43 +111,46 @@ scores_base = WeakClassifier.REPTree(x_values, y_values)
 #     return [evl_scores]
 
 def evalFeatureEngineering(individuals):
-    try:
-        # Creating new features
-        new_features = []
-        for ind_num, ind in enumerate(individuals):
-            func = gp.compile(expr=ind, pset=pset)
-            new_features.append([func(*record) for record in x_values])
-        
-        # Transpose New Feature Array
-        new_features = np.transpose(np.array(new_features))
-        
-        # Decision Tree Classifier
-        evl_scores = WeakClassifier.REPTree(new_features, y_values)
-        print(evl_scores)
-    finally:
-        del new_features
-        gc.collect()
+    new_features = []
+
+    # Create new features
+    for ind_num, ind in enumerate(individuals):
+        func = gp.compile(expr=ind, pset=pset)
+        new_features.append([func(*record) for record in x_values])
+    
+    # Transpose New Feature Array
+    new_features = np.transpose(np.array(new_features))
+    
+    # Decision Tree Classifier
+    evl_scores = call_REPTree(new_features, y_values)
+
+    print(evl_scores)
     
     # Returns accuracy
     return [evl_scores]
 
-# Define new functions
+# Baseline calculation
+print('Modeling the baseline...')
+scores_base = call_REPTree(x_values, y_values)
+# print(scores_base)
+
+# Define primitive
 # def protectedDiv(left, right):
 #     if right == 0:
 #         return 1
 #     return left / right
 
-def less(left, right):
-    if left < right:
-        return 1
-    else:
-        return 0
+# def less(left, right):
+#     if left < right:
+#         return 1
+#     else:
+#         return 0
     
-def great(left, right):
-    if left > right:
-        return 1
-    else:
-        return 0
+# def great(left, right):
+#     if left > right:
+#         return 1
+#     else:
+#         return 0
 
 # def equal(left, right):
 #     if left == right:
@@ -125,7 +179,6 @@ pset.addEphemeralConstant("uni101", low_precision_random)
 def selElitistAndTournament(individuals, k, frac_elitist, tournsize):
     return tools.selBest(individuals, int(k*frac_elitist)) + tools.selTournament(individuals, int(k*(1-frac_elitist)), tournsize=tournsize)
 
-
 toolbox = base.Toolbox()
 toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=5)
 
@@ -143,10 +196,12 @@ def cxOnePointListOfTrees(ind1, ind2, max_depth=max_depth):
         tree1, tree2 = gp.cxOnePoint(tree1, tree2)
         if tree1.height > max_depth or tree2.height > max_depth:
             # If the depth of any tree exceeds the limit, the original individual is restored
-            return original_ind1, original_ind2
+            return original_ind1, original_ind2          
+        
     return ind1, ind2
 
 def mutUniformListOfTrees(individual, expr, pset, max_depth=max_depth):
+    
     original_individual = toolbox.clone(individual)
 
     for tree in individual:
@@ -154,6 +209,7 @@ def mutUniformListOfTrees(individual, expr, pset, max_depth=max_depth):
         if mutated_tree.height > max_depth:
             # If the depth of the tree exceeds the limit, the original individual is restored
             return original_individual,
+    
     return individual,
 
 toolbox.register("individual", initIndividual, creator.Individual, toolbox.expr, size=n_feature)  # Create n features
@@ -167,7 +223,7 @@ toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("compile", gp.compile, pset=pset)
 
 
-# Genetic Programming Algorithms
+# Genetic Programming algorithms
 population = toolbox.population(n=pop_size)
 hof = tools.HallOfFame(10)
 
@@ -182,24 +238,20 @@ pop, log = algorithms.eaSimple(population, toolbox,
                                 cxpb=crossover_pb, mutpb=mutation_pb, ngen=ngen,
                                 stats=stats, halloffame=hof, verbose=True)
 
-jvm.stop()
 
-print('--' * 30)
-
-print(f'\nWeka.REPTree p {pop_size}, ngen {ngen}, crossover {crossover_pb}, mutation {mutation_pb}, Elitist {frac_elitist}, feature {n_feature}')
+print('--' * 40)
+print(f'Weka.REPTree p {pop_size}, ngen {ngen}, crossover {crossover_pb}, mutation {mutation_pb}, Elitist {frac_elitist}, feature {n_feature}')
+print('--' * 40)
+print('Baseline Acc:', scores_base)
+print('--' * 40)
 
 print('Log:')
 print(log)
-
-# print('Hof:')
-# for ind in hof:
-#     print(str(ind))
-
-print('Baseline Acc:', scores_base)
+print('--' * 40)
 
 # Best individual
 best_ind=hof[0]
-print('Best individual is:', [str(tree) for tree in best_ind])
+print('\nBest individual is:', [str(tree) for tree in best_ind])
 print('With fitness:', best_ind.fitness.values)
 
 sec_ind=hof[1]
@@ -217,23 +269,3 @@ print('With fitness:', forth_ind.fitness.values)
 fifth_ind=hof[4]
 print('5th best individual is:', [str(tree) for tree in fifth_ind])
 print('With fitness:', fifth_ind.fitness.values)
-
-sixth_ind=hof[5]
-print('6th individual is:', [str(tree) for tree in sixth_ind])
-print('With fitness:', sixth_ind.fitness.values)
-
-seventh_ind=hof[6]
-print('7th best individual is:', [str(tree) for tree in seventh_ind])
-print('With fitness:', seventh_ind.fitness.values)
-
-eighth_ind=hof[7]
-print('8th best individual is:', [str(tree) for tree in eighth_ind])
-print('With fitness:', eighth_ind.fitness.values)
-
-ninth_ind=hof[8]
-print('9th best individual is:', [str(tree) for tree in ninth_ind])
-print('With fitness:', ninth_ind.fitness.values)
-
-tenth_ind=hof[9]
-print('10th best individual is:', [str(tree) for tree in tenth_ind])
-print('With fitness:', tenth_ind.fitness.values)
