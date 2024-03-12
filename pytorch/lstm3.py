@@ -19,7 +19,7 @@ num_layers = 3
 bidirectional = True
 num_classes = 2
 
-epochs = 2000
+epochs = 5000
 batch_size = 256
 lrn_rate = 0.005
 sequence_length = 16
@@ -31,7 +31,6 @@ if num_layers > 1:
     dropout = 0.1
 else:
     dropout = 0
-
 
 # ---------------------------------------------------------
 
@@ -82,7 +81,6 @@ def data_load(n):
     print(f"\nDataset {n} loaded...")
 
     return train_loader, val_loader
-
 
 # ---------------------------------------------------------
 

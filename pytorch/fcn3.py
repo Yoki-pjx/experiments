@@ -27,7 +27,7 @@ def setup_seed(seed):
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
 
-# Load dataset
+# Load dataset_normalization
 class MyDataset(Dataset):
     def __init__(self, src_file):
         all_data = np.loadtxt(src_file, usecols=range(0, 21), delimiter=",", comments="#", dtype=np.float32, skiprows=1)
