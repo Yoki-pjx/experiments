@@ -112,17 +112,17 @@ class SNN_Model(nn.Module):
         self.mask2 = self.mask2.float()
 
 
-        self.alpha1 = torch.nn.Parameter((1e-1 * torch.ones(1)).cuda(), requires_grad=True)
-        self.alpha2 = torch.nn.Parameter((1e-1 * torch.ones(1)).cuda(), requires_grad=True)
+        self.alpha1 = torch.nn.Parameter((1e-1 * torch.ones(1)).to(device), requires_grad=True)
+        self.alpha2 = torch.nn.Parameter((1e-1 * torch.ones(1)).to(device), requires_grad=True)
 
-        self.eta1 = torch.nn.Parameter((.0 * torch.zeros(1,cfg_fc[0])).cuda(), requires_grad=True)
-        self.eta2 = torch.nn.Parameter((.0 * torch.zeros(1,cfg_fc[1])).cuda(), requires_grad=True)
+        self.eta1 = torch.nn.Parameter((.0 * torch.zeros(1,cfg_fc[0])).to(device), requires_grad=True)
+        self.eta2 = torch.nn.Parameter((.0 * torch.zeros(1,cfg_fc[1])).to(device), requires_grad=True)
 
-        self.gamma1 = torch.nn.Parameter((1e-2 * torch.ones(1)).cuda(), requires_grad=True)
-        self.gamma2 = torch.nn.Parameter((1e-2 * torch.ones(1)).cuda(), requires_grad=True)
+        self.gamma1 = torch.nn.Parameter((1e-2 * torch.ones(1)).to(device), requires_grad=True)
+        self.gamma2 = torch.nn.Parameter((1e-2 * torch.ones(1)).to(device), requires_grad=True)
 
-        self.beta1 = torch.nn.Parameter((1e-3 * torch.ones(1, fc_dim)).cuda(), requires_grad=True)
-        self.beta2 = torch.nn.Parameter((1e-3 * torch.ones(1, cfg_fc[0])).cuda(), requires_grad=True)
+        self.beta1 = torch.nn.Parameter((1e-3 * torch.ones(1, fc_dim)).to(device), requires_grad=True)
+        self.beta2 = torch.nn.Parameter((1e-3 * torch.ones(1, cfg_fc[0])).to(device), requires_grad=True)
 
     def mask_weight(self): 
         self.fc1.weight.data = self.fc1.weight.data * self.mask1
