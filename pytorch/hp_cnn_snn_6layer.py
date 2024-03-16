@@ -25,7 +25,7 @@ w_decay = 0.9 # weight decay factor
 num_classes = 2
 batch_size = 100
 tau_w = 40 # synaptic filtering constant 
-num_epochs = 3
+num_epochs = 200
 learning_rate = 5e-4
 # lp_learning_rate = 5e-4  # learning rate of meta-local parameters 
 # gp_learning_rate = 1e-3 # learning rate of gp-based parameters 
@@ -258,7 +258,7 @@ def data(n):
     return train_loader, test_loader
 
 
-for n in range(9,10):
+for n in range(0,10):
 
     train_loader, test_loader = data(n)
 
