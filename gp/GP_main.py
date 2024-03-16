@@ -174,6 +174,8 @@ if __name__ == "__main__":
     # Baseline calculation
     print('Modeling the baseline...')
     scores_base = call_REPTree(x_values, y_values)
+    print('Baseline Acc:', scores_base)
+    print('--' * 40)
     # print(scores_base)
 
     # Define primitive

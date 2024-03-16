@@ -10,7 +10,7 @@ from weka.classifiers import Evaluation
 from weka.core.classes import Random
 
 
-def REPTree(x_values, y_values, options=["-L", "10"]):
+def REPTree(x_values, y_values, options=["-L", "30"]):
     # print("Creating dataset for Weka...")
     dataset = create_instances_from_matrices(x_values, y_values, name="features")
     dataset.class_is_last()
